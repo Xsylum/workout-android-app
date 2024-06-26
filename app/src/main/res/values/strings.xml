@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">WorkoutApplication</string>
+    <string name="welcome_text">Welcome to my App!</string>
+</resources>
