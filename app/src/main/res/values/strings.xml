@@ -3,4 +3,6 @@
     <string name="welcome_text">Welcome to my App!</string>
     <string name="exercise_management_header">Manage Exercise Information</string>
     <string name="element_text">testingText</string>
+    <string name="exercise_name">ExerciseName</string>
+    <string name="exercise_description">Example exercise description in this slot</string>
 </resources>
