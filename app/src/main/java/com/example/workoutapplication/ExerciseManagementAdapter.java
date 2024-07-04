@@ -8,9 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class ExerciseManagementAdapter extends RecyclerView.Adapter<ExerciseManagementAdapter.ExerciseViewHolder> {
 
-    private Exercise[] localDataSet;
+    private ArrayList<Exercise> localDataSet;
 
     // Providing a reference to type of views being used
     // (custom ViewHolder)
@@ -44,7 +46,7 @@ public class ExerciseManagementAdapter extends RecyclerView.Adapter<ExerciseMana
      * @param dataSet String[] containing the data to populate views
      *                to be used by RecyclerView
      */
-    public ExerciseManagementAdapter(Exercise[] dataSet) {
+    public ExerciseManagementAdapter(ArrayList<Exercise> dataSet) {
         localDataSet = dataSet;
     }
 
@@ -65,13 +67,13 @@ public class ExerciseManagementAdapter extends RecyclerView.Adapter<ExerciseMana
 
         // Get element from your dataset at this position and
         // replace the contents of the view with that element
-        viewHolder.getExerciseNameView().setText(localDataSet[position].getName());
-        viewHolder.getExerciseDescription().setText(localDataSet[position].getDescription());
+        viewHolder.getExerciseNameView().setText(localDataSet.get(position).getName());
+        viewHolder.getExerciseDescription().setText(localDataSet.get(position).getDescription());
     }
 
     @Override
     public int getItemCount() {
-        return localDataSet.length;
+        return localDataSet.size();
     }
 
 }

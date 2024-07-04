@@ -5,4 +5,5 @@
     <string name="element_text">testingText</string>
     <string name="exercise_name">ExerciseName</string>
     <string name="exercise_description">Example exercise description in this slot</string>
+    <string name="add_exercise">Add Exercise</string>
 </resources>
