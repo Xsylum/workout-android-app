@@ -3,6 +3,7 @@ package com.example.workoutapplication;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.MonthDay;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class WorkoutLog {
@@ -10,7 +11,7 @@ public class WorkoutLog {
     private LocalDate date;
     private LocalTime timeOfCompletion;
     private Regimen workoutRegimen;
-    private ArrayList<ExerciseStats[]> exerciseStats;
+    private ArrayList<ExerciseStats> exerciseStats;
 
     public WorkoutLog(LocalDate date)
     {
