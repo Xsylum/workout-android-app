@@ -15,6 +15,7 @@ public class Exercise {
     public Exercise (String name, String description) {
         this.name = name;
         this.description = description;
+        tags = new LinkedList<String>();
     }
 
     public String getName()
@@ -48,6 +49,11 @@ public class Exercise {
     }
 
     // Tag Methods
+    public LinkedList<String> getTags()
+    {
+        return tags;
+    }
+
     public void clearAllTags() {
         tags.clear();
     }
