@@ -1,6 +1,9 @@
 package com.example.workoutapplication;
 
+import android.content.Context;
+
 import androidx.datastore.preferences.core.Preferences;
+import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
 import androidx.datastore.rxjava3.RxDataStore;
 
 /**
@@ -13,8 +16,12 @@ public class DataStoreSingleton {
     // The singleton that all activities will call when using DataStore
     private static final DataStoreSingleton singletonInstance = new DataStoreSingleton();
     
-    public static DataStoreSingleton getInstance()
+    public static DataStoreSingleton getInstance(Context context)
     {
+        if (singletonInstance.dataStore == null) {
+            singletonInstance.dataStore = new RxPreferenceDataStoreBuilder(context, "MyData").build();
+        }
+
         return singletonInstance;
     }
 
