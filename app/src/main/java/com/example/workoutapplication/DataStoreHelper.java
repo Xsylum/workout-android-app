@@ -1,6 +1,7 @@
 package com.example.workoutapplication;
 
 import android.app.Activity;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,6 +10,7 @@ import androidx.datastore.preferences.core.Preferences;
 import androidx.datastore.preferences.core.PreferencesKeys;
 import androidx.datastore.rxjava3.RxDataStore;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.rxjava3.core.Single;
@@ -39,16 +41,20 @@ public class DataStoreHelper {
         @NonNull
         @Override
         public Map<Key<?>, Object> asMap() {
-            return null;
+            return new HashMap<>();
         }
     }; //TODO: autofilled this, check if the non-abstract code causes errors
 
+    public DataStoreHelper(Activity activity, RxDataStore<Preferences> dataStoreRx)
+    {
+        this.activity = activity;
+        this.dataStoreRx = dataStoreRx;
+    }
+
     // NOTE, to put any other type of value (bool, int, etc.) another
     // version of the below "putXValue" and "getXValue" will need to be created
-    public boolean putStringValue(String key, String value)
+    public boolean setStringValue(String key, String value)
     {
-        boolean returnValue;
-
         Preferences.Key<String> PREF_KEY = PreferencesKeys.stringKey(key);
         Single<Preferences> updateResult = dataStoreRx.updateDataAsync(prefsIn -> {
             MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
@@ -56,16 +62,17 @@ public class DataStoreHelper {
             return Single.just(mutablePreferences);
         }).onErrorReturnItem(pref_error);
 
-        returnValue = updateResult.blockingGet() != pref_error;
-        return returnValue;
+        return updateResult.blockingGet() != pref_error;
     }
 
     String getStringValue(String Key)
     {
         Preferences.Key<String> PREF_KEY = PreferencesKeys.stringKey(Key);
         Single<String> value = dataStoreRx.data().firstOrError()
-                .map(prefs -> prefs.get(PREF_KEY)).onErrorReturnItem("null");
+                .map(prefs -> prefs.get(PREF_KEY));//.onErrorReturnItem("getStringValueNull");
         return value.blockingGet();
     }
+
+
 
 }
