@@ -67,8 +67,8 @@ public class ExerciseManagementAdapter extends RecyclerView.Adapter<ExerciseMana
 
         // Get element from your dataset at this position and
         // replace the contents of the view with that element
-        viewHolder.getExerciseNameView().setText(localDataSet.get(position).getName());
-        viewHolder.getExerciseDescription().setText(localDataSet.get(position).getDescription());
+        viewHolder.getExerciseNameView().setText(localDataSet.get(position).name);
+        viewHolder.getExerciseDescription().setText(localDataSet.get(position).description);
     }
 
     @Override

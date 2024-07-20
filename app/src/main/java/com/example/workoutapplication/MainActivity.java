@@ -58,20 +58,20 @@ public class MainActivity extends AppCompatActivity {
         Exercise tempExercise1 = new Exercise("Deadlift", "Lifting bar real cool");
         tempExercise1.addTag("legs");
         tempExercise1.addTag("Biceps");
-        tempExercise1.setThumbnailID("001.jpg");
+        tempExercise1.thumbnailID = "001.jpg";
 
         Exercise tempExercise2 = new Exercise("Rows", "Kind of like a boat!");
         tempExercise2.addTag("Shoulders");
-        tempExercise2.setThumbnailID("002.jpg");
+        tempExercise2.thumbnailID = "002.jpg";
 
         Exercise tempExercise3 = new Exercise("Glute Bridge", "Lift dat butt!");
         tempExercise3.addTag("Glutes");
         tempExercise3.addTag("legs");
-        tempExercise3.setThumbnailID("003.jpg");
+        tempExercise3.thumbnailID = "003.jpg";
 
         Exercise tempExercise4 = new Exercise("Bicep Curls", "Working that iron");
         tempExercise4.addTag("Biceps");
-        tempExercise4.setThumbnailID("004.jpg");
+        tempExercise4.thumbnailID = "004.jpg";
 
         JSONArray resultArray = new JSONArray();
         resultArray.put(tempExercise1.toJsonString());
