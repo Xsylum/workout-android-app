@@ -83,7 +83,7 @@ class Exercise {
     companion object {
         /**
          * Exercise constructor which takes a JsonString, in the format of .toJsonString()
-         * @param JsonString
+         * @param jsonString string with a json-style format to be converted
          * @return an Exercise with attributes based on JsonString
          */
         fun fromJsonString(jsonString: String?): Exercise {
