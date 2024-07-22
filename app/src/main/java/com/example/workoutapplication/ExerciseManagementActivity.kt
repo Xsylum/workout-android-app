@@ -13,12 +13,15 @@ class ExerciseManagementActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_management)
 
+        UpdateExerciseFragment().show(supportFragmentManager, "GAME_DIALOG")
+
         // Getting DataStore to read/write an ExerciseList Preference
         val dataStoreSingleton = DataStoreSingleton.getInstance(this)
         val dataStoreHelper = DataStoreHelper(this, dataStoreSingleton.dataStore!!)
 
-        val exerciseListJsonString = dataStoreHelper.getStringValue("ExerciseList");
-        val exerciseList = JSONArray(exerciseListJsonString)
+        val exerciseListJson: String? = dataStoreHelper.getStringValue("ExerciseList");
+        val exerciseList = if (exerciseListJson != null)
+            JSONArray(exerciseListJson) else JSONArray()
 
         // Setting up Activity's list of exercises
         val displayList = ArrayList<Exercise>()
