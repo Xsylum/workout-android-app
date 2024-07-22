@@ -38,12 +38,22 @@ class DataStoreHelper(var activity: Activity, private var dataStore: DataStore<P
         return true
     }
 
-    fun getStringValue(key: String): String {
+    /**
+     * Retrieves a String from DataStore using a key
+     *
+     * Note that the method returns null in the case that the given
+     * key does not exist within the DataStore. Users should therefore
+     * prepare an exception or default value when calling this method
+     *
+     * @param key a string-based key to search the DataStore
+     * @return String associated with key, or null if key is not in DataStore
+     */
+    fun getStringValue(key: String): String? {
         val prefKey = stringPreferencesKey(key)
         val value = runBlocking {
             val preferences = dataStore.data.first()
             preferences[prefKey];
         }
-        return value ?: "null"
+        return value
     }
 }
