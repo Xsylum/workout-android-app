@@ -1,14 +1,18 @@
 package com.example.workoutapplication
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
 
-class ExerciseManagementActivity : AppCompatActivity() {
+class ExerciseManagementActivity : AppCompatActivity(),
+    UpdateExerciseFragment.UpdateExerciseDialogListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_management)
@@ -45,6 +49,18 @@ class ExerciseManagementActivity : AppCompatActivity() {
             exerciseList.put(addedExercise.toJsonString())
             dataStoreHelper.setStringValue("ExerciseList", exerciseList.toString())
         }
+    }
+
+    // User tapped the positive button of the exercise fragment
+    override fun onDialogPositiveClick(dialog: DialogFragment) {
+        val exerciseName: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseName)
+        val exerciseDesc: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseDescription)
+
+        Log.d("MainTest", "${exerciseName.text} & ${exerciseDesc.text}")
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+
     }
 
     private fun DEBUG_ExerciseList(): JSONArray {
