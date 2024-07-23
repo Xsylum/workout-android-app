@@ -8,24 +8,40 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.ExerciseManagementAdapter.ExerciseViewHolder
 
-class ExerciseManagementAdapter (private val localDataSet: ArrayList<Exercise>) : RecyclerView.Adapter<ExerciseViewHolder>() {
+class ExerciseManagementAdapter (private val localDataSet: ArrayList<Exercise>,
+    private val listener: ExerciseRecyclerViewListener) : RecyclerView.Adapter<ExerciseViewHolder>() {
+
+    interface ExerciseRecyclerViewListener {
+        fun onListItemClick(position: Int)
+    }
 
     // Providing a reference to type of views being used
     // (custom ViewHolder)
-    class ExerciseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class ExerciseViewHolder(view: View) : RecyclerView.ViewHolder(view),
+        View.OnClickListener {
         val exerciseThumbnailView: ImageView
         val exerciseNameView: TextView
         val exerciseDescription: TextView
 
         // ViewHolder constructed using a given view (which it will hold)
         init {
-
-            // NOTE: could define click listener here
+            // When this view (list item) is clicked, this class will be returned
+            // as an interface View.OnClickListener, which can then run onClick()
+            view.setOnClickListener(this)
 
             // in the view, find the element with id textView
             exerciseThumbnailView = view.findViewById<View>(R.id.iv_exercise_thumbnail) as ImageView
             exerciseNameView = view.findViewById<View>(R.id.tv_exercise_name) as TextView
             exerciseDescription = view.findViewById<View>(R.id.tv_exercise_description) as TextView
+        }
+
+        override fun onClick(v: View?) {
+            val position = adapterPosition
+            // NO_POSITION is returned if the user clicks a
+            // removed item while the animation is running
+            if (position != RecyclerView.NO_POSITION) {
+                listener.onListItemClick(position)
+            }
         }
     }
 
