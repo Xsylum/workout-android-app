@@ -13,42 +13,66 @@ import org.json.JSONArray
 
 class ExerciseManagementActivity : AppCompatActivity(),
     UpdateExerciseFragment.UpdateExerciseDialogListener {
+
+    private var displayList = ArrayList<Exercise>()
+    private lateinit var jsonExerciseArray: JSONArray
+    private lateinit var recyclerView: RecyclerView
+
+    // Getting DataStore to read/write an ExerciseList Preference
+    private val dataStoreSingleton = DataStoreSingleton.getInstance(this)
+    private val dataStoreHelper = DataStoreHelper(this, dataStoreSingleton.dataStore!!)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_management)
 
-        UpdateExerciseFragment().show(supportFragmentManager, "GAME_DIALOG")
-
-        // Getting DataStore to read/write an ExerciseList Preference
-        val dataStoreSingleton = DataStoreSingleton.getInstance(this)
-        val dataStoreHelper = DataStoreHelper(this, dataStoreSingleton.dataStore!!)
-
+        // Retrieving exercise list from DataStore
         val exerciseListJson: String? = dataStoreHelper.getStringValue("ExerciseList");
-        val exerciseList = if (exerciseListJson != null)
+        jsonExerciseArray = if (exerciseListJson != null)
             JSONArray(exerciseListJson) else JSONArray()
 
         // Setting up Activity's list of exercises
-        val displayList = ArrayList<Exercise>()
-        for (i in 0 ..< exerciseList.length()) {
-            val exercise = Exercise.fromJsonString(exerciseList[i].toString())
+        for (i in 0 ..< jsonExerciseArray.length()) {
+            val exercise = Exercise.fromJsonString(jsonExerciseArray[i].toString())
             displayList.add(exercise)
         }
 
-        val recyclerView = findViewById<RecyclerView>(R.id.rv_exerciseManagerList)
+        // initializing recyclerView
+        recyclerView = findViewById<RecyclerView>(R.id.rv_exerciseManagerList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = ExerciseManagementAdapter(displayList)
 
         // Modify exercise list buttons
         var addExerciseButton = findViewById<View>(R.id.btn_addExercise) as Button
         addExerciseButton.setOnClickListener {
-            val addedExercise = Exercise("test", "test")
-
-            displayList.add(addedExercise)
-            recyclerView.adapter!!.notifyItemInserted(displayList.size - 1)
-
-            exerciseList.put(addedExercise.toJsonString())
-            dataStoreHelper.setStringValue("ExerciseList", exerciseList.toString())
+            showAddExerciseDialog();
         }
+    }
+
+    /**
+     * Displays dialog fragment for adding a new exercise to the exercise list
+     */
+    private fun showAddExerciseDialog() {
+        val fragment = UpdateExerciseFragment();
+        fragment.show(supportFragmentManager, "GAME_DIALOG")
+    }
+
+    /**
+     * Updates recycler view by notifying of a change in dataSet items
+     */
+    private fun updateExerciseRecyclerView() {
+        recyclerView.adapter!!.notifyItemInserted(displayList.size - 1)
+    }
+
+    /**
+     * Adds a new exercise to DataStore's ExerciseList json string
+     */
+    private fun updateDataStoreExerciseList(newExercise: Exercise) {
+        val exerciseJsonString = newExercise.toJsonString()
+
+        jsonExerciseArray.put(exerciseJsonString)
+        dataStoreHelper.setStringValue("ExerciseList", jsonExerciseArray.toString())
     }
 
     // User tapped the positive button of the exercise fragment
@@ -56,7 +80,11 @@ class ExerciseManagementActivity : AppCompatActivity(),
         val exerciseName: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseName)
         val exerciseDesc: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseDescription)
 
-        Log.d("MainTest", "${exerciseName.text} & ${exerciseDesc.text}")
+        val addedExercise = Exercise(exerciseName.text.toString(), exerciseDesc.text.toString())
+        displayList.add(addedExercise)
+
+        updateExerciseRecyclerView()
+        updateDataStoreExerciseList(addedExercise) // TODO: this will have to be splitup to allow faster reordering of exercises in displayList
     }
 
     override fun onDialogNegativeClick(dialog: DialogFragment) {
