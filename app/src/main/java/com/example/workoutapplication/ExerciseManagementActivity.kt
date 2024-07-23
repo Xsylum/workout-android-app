@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
 
 class ExerciseManagementActivity : AppCompatActivity(),
-    UpdateExerciseFragment.UpdateExerciseDialogListener {
+    UpdateExerciseFragment.UpdateExerciseDialogListener,
+    ExerciseManagementAdapter.ExerciseRecyclerViewListener {
 
     private var displayList = ArrayList<Exercise>()
     private lateinit var jsonExerciseArray: JSONArray
@@ -41,7 +42,7 @@ class ExerciseManagementActivity : AppCompatActivity(),
         // initializing recyclerView
         recyclerView = findViewById<RecyclerView>(R.id.rv_exerciseManagerList)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = ExerciseManagementAdapter(displayList)
+        recyclerView.adapter = ExerciseManagementAdapter(displayList, this)
 
         // Modify exercise list buttons
         var addExerciseButton = findViewById<View>(R.id.btn_addExercise) as Button
@@ -50,19 +51,36 @@ class ExerciseManagementActivity : AppCompatActivity(),
         }
     }
 
+    // TODO: prevent fragment from displaying when there is already a fragment on the screen
+    override fun onListItemClick(position: Int) {
+        val targetExercise = displayList[position]
+        showUpdateExerciseDialog(targetExercise.name!!, targetExercise.description!!, position)
+    }
+
     /**
      * Displays dialog fragment for adding a new exercise to the exercise list
      */
     private fun showAddExerciseDialog() {
         val fragment = UpdateExerciseFragment();
-        fragment.show(supportFragmentManager, "GAME_DIALOG")
+        fragment.show(supportFragmentManager, "EXERCISE_ADD_DIALOG")
+    }
+
+    private fun showUpdateExerciseDialog(exerciseName:String,
+                                         exerciseDesc: String,
+                                         listPosition: Int) {
+        val fragment = UpdateExerciseFragment(exerciseName, exerciseDesc, listPosition)
+        fragment.show(supportFragmentManager, "EXERCISE_UPDATE_DIALOG")
     }
 
     /**
      * Updates recycler view by notifying of a change in dataSet items
      */
-    private fun updateExerciseRecyclerView() {
+    private fun updateRecyclerViewInsert() {
         recyclerView.adapter!!.notifyItemInserted(displayList.size - 1)
+    }
+
+    private fun updateRecyclerViewItemEdit(position: Int) {
+        recyclerView.adapter!!.notifyItemChanged(position)
     }
 
     /**
@@ -76,15 +94,20 @@ class ExerciseManagementActivity : AppCompatActivity(),
     }
 
     // User tapped the positive button of the exercise fragment
-    override fun onDialogPositiveClick(dialog: DialogFragment) {
+    override fun onDialogPositiveClick(dialog: DialogFragment, listPosition:Int) {
         val exerciseName: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseName)
         val exerciseDesc: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseDescription)
 
-        val addedExercise = Exercise(exerciseName.text.toString(), exerciseDesc.text.toString())
-        displayList.add(addedExercise)
+        val newExercise = Exercise(exerciseName.text.toString(), exerciseDesc.text.toString())
+        if (listPosition == -1) {
+            displayList.add(newExercise)
+            updateRecyclerViewInsert()
+        } else {
+            displayList[listPosition] = newExercise
+            updateRecyclerViewItemEdit(listPosition)
+        }
 
-        updateExerciseRecyclerView()
-        updateDataStoreExerciseList(addedExercise) // TODO: this will have to be splitup to allow faster reordering of exercises in displayList
+        updateDataStoreExerciseList(newExercise) // TODO: this method have to be splitup to allow faster reordering of exercises in displayList
     }
 
     override fun onDialogNegativeClick(dialog: DialogFragment) {
