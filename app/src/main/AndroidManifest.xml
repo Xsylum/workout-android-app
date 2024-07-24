@@ -13,6 +13,9 @@
         android:theme="@style/Theme.WorkoutApplication"
         tools:targetApi="31">
         <activity
+            android:name=".RegimenManagementActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegimenDesignActivity"
             android:exported="false" />
         <activity

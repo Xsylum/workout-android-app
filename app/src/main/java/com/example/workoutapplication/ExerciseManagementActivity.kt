@@ -40,7 +40,7 @@ class ExerciseManagementActivity : AppCompatActivity(),
         }
 
         // initializing recyclerView
-        recyclerView = findViewById<RecyclerView>(R.id.rv_exerciseManagerList)
+        recyclerView = findViewById(R.id.rv_exerciseManagerList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = ExerciseManagementAdapter(displayList, this)
 

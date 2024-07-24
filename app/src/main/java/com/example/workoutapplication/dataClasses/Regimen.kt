@@ -4,7 +4,7 @@ package com.example.workoutapplication.dataClasses
  * A class which allowing the user to define a set of
  * exercises, to act as a plan for the user's workout(s)
  */
-class Regimen (var name: String) {
+class Regimen (var name: String, var description: String) {
     val exerciseList = ArrayList<Exercise>();
 
     // Modifying Exercise List Methods
