@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
 
 class ExerciseManagementActivity : AppCompatActivity(),
-    UpdateExerciseFragment.UpdateExerciseDialogListener,
+    ExerciseManagementFragment.ExerciseManagementDialogListener,
     ExerciseManagementAdapter.ExerciseRecyclerViewListener {
 
     private var displayList = ArrayList<Exercise>()
@@ -61,14 +61,14 @@ class ExerciseManagementActivity : AppCompatActivity(),
      * Displays dialog fragment for adding a new exercise to the exercise list
      */
     private fun showAddExerciseDialog() {
-        val fragment = UpdateExerciseFragment();
+        val fragment = ExerciseManagementFragment();
         fragment.show(supportFragmentManager, "EXERCISE_ADD_DIALOG")
     }
 
     private fun showUpdateExerciseDialog(exerciseName:String,
                                          exerciseDesc: String,
                                          listPosition: Int) {
-        val fragment = UpdateExerciseFragment(exerciseName, exerciseDesc, listPosition)
+        val fragment = ExerciseManagementFragment(exerciseName, exerciseDesc, listPosition)
         fragment.show(supportFragmentManager, "EXERCISE_UPDATE_DIALOG")
     }
 
@@ -83,64 +83,63 @@ class ExerciseManagementActivity : AppCompatActivity(),
         recyclerView.adapter!!.notifyItemChanged(position)
     }
 
+    private fun updateRecyclerViewDelete(position: Int) {
+        recyclerView.adapter!!.notifyItemRemoved(position)
+    }
+
     /**
      * Adds a new exercise to DataStore's ExerciseList json string
      */
-    private fun updateDataStoreExerciseList(newExercise: Exercise) {
+    private fun dataStoreExerciseInsert(newExercise: Exercise) {
         val exerciseJsonString = newExercise.toJsonString()
 
         jsonExerciseArray.put(exerciseJsonString)
         dataStoreHelper.setStringValue("ExerciseList", jsonExerciseArray.toString())
     }
 
-    // User tapped the positive button of the exercise fragment
-    override fun onDialogPositiveClick(dialog: DialogFragment, listPosition:Int) {
+    private fun dataStoreExerciseDelete(position: Int) {
+        jsonExerciseArray.remove(position)
+        dataStoreHelper.setStringValue("ExerciseList", jsonExerciseArray.toString())
+    }
+
+    /**
+     * Adds a new exercise to ExerciseList based on fragment information
+     *
+     * Executed when ExerciseManagementDialogListener broadcasts that the
+     * fragment's positive button was clicked
+     */
+    override fun onDialogPositiveClick(dialog: DialogFragment, position:Int) {
         val exerciseName: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseName)
         val exerciseDesc: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseDescription)
 
         val newExercise = Exercise(exerciseName.text.toString(), exerciseDesc.text.toString())
-        if (listPosition == -1) {
+        if (position == -1) {
             displayList.add(newExercise)
             updateRecyclerViewInsert()
         } else {
-            displayList[listPosition] = newExercise
-            updateRecyclerViewItemEdit(listPosition)
+            displayList[position] = newExercise
+            updateRecyclerViewItemEdit(position)
         }
 
-        updateDataStoreExerciseList(newExercise) // TODO: this method have to be splitup to allow faster reordering of exercises in displayList
+        dataStoreExerciseInsert(newExercise) // TODO: this method have to be splitup to allow faster reordering of exercises in displayList
     }
 
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
+    override fun onDialogNeutralClick(dialog: DialogFragment) { /** No Effect **/ }
 
-    }
+    /**
+     * Deletes an exercise from ExerciseList after using the update fragment
+     *
+     * Executed when ExerciseManagementDialogListener broadcasts that the
+     * fragment's negative button was clicked.
+     * Note that the negative button only appears when attempting to edit an existing
+     * exercise, never when adding a new one.
+     */
+    override fun onDialogNegativeClick(dialog: DialogFragment, position: Int) {
+        val targetExercise = displayList[position]
 
-    private fun DEBUG_ExerciseList(): JSONArray {
-        // TEMP DEBUG EXERCISES
-        val tempExercise1 = Exercise("Deadlift", "Lifting bar real cool").apply {
-            addTag("legs")
-            addTag("Biceps")
-            thumbnailID = "001.jpg"
-        }
-        val tempExercise2 = Exercise("Rows", "Kind of like a boat!").apply {
-            addTag("Shoulders")
-            thumbnailID = "002.jpg"
-        }
-        val tempExercise3 = Exercise("Glute Bridge", "Lift dat butt!").apply {
-            addTag("Glutes")
-            addTag("legs")
-            thumbnailID = "003.jpg"
-        }
-        val tempExercise4 = Exercise("Bicep Curls", "Working that iron").apply {
-            addTag("Biceps")
-            thumbnailID = "004.jpg"
-        }
-        val resultArray = JSONArray().apply {
-            put(tempExercise1.toJsonString())
-            put(tempExercise2.toJsonString())
-            put(tempExercise3.toJsonString())
-            put(tempExercise4.toJsonString())
-        }
+        displayList.removeAt(position)
+        updateRecyclerViewDelete(position)
 
-        return resultArray
+        dataStoreExerciseDelete(position)
     }
 }
