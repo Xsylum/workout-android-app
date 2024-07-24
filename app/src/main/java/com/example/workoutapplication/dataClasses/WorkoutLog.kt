@@ -1,5 +1,7 @@
-package com.example.workoutapplication
+package com.example.workoutapplication.dataClasses
 
+import com.example.workoutapplication.dataClasses.ExerciseStats
+import com.example.workoutapplication.dataClasses.Regimen
 import java.time.LocalDate
 import java.time.LocalTime
 

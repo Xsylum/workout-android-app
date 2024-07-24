@@ -1,4 +1,4 @@
-package com.example.workoutapplication
+package com.example.workoutapplication.dataClasses
 
 class ExerciseStats (private val exercise: Exercise, private val partOfWorkout: WorkoutLog) {
     //TODO: check that length is correct! (don't allow 1 where there is no metric definition!)

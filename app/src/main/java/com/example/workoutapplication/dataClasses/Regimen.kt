@@ -1,4 +1,4 @@
-package com.example.workoutapplication
+package com.example.workoutapplication.dataClasses
 
 /**
  * A class which allowing the user to define a set of

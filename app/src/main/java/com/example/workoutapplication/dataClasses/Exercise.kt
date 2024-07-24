@@ -1,4 +1,4 @@
-package com.example.workoutapplication
+package com.example.workoutapplication.dataClasses
 
 import org.json.JSONArray
 import org.json.JSONException

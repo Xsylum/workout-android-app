@@ -7,9 +7,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.ExerciseManagementAdapter.ExerciseViewHolder
+import com.example.workoutapplication.dataClasses.Exercise
 
 class ExerciseManagementAdapter (private val localDataSet: ArrayList<Exercise>,
-    private val listener: ExerciseRecyclerViewListener) : RecyclerView.Adapter<ExerciseViewHolder>() {
+                                 private val listener: ExerciseRecyclerViewListener) : RecyclerView.Adapter<ExerciseViewHolder>() {
 
     interface ExerciseRecyclerViewListener {
         fun onListItemClick(position: Int)
