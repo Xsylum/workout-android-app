@@ -8,11 +8,10 @@ import java.util.UUID
 
 class Exercise {
     // TODO: check uniqueness (unique name/description?)
-    private lateinit var exerciseID: UUID // Class with very low-probably of generating the same "unique ID"
+    lateinit var exerciseID: UUID // Class with very low-probably of generating the same "unique ID"
+        private set
     var name: String? = null
-    @JvmField
     var description: String? = null
-    @JvmField
     var thumbnailID: String? = null // Passing the storing/loading of images onto the activity
 
     // Tag Methods
