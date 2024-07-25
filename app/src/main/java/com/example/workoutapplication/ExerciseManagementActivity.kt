@@ -47,7 +47,7 @@ class ExerciseManagementActivity : AppCompatActivity(),
         // Modify exercise list buttons
         var addExerciseButton = findViewById<View>(R.id.btn_addExercise) as Button
         addExerciseButton.setOnClickListener {
-            showAddExerciseDialog();
+            showAddExerciseDialog()
         }
     }
 
@@ -73,7 +73,7 @@ class ExerciseManagementActivity : AppCompatActivity(),
     }
 
     /**
-     * Updates recycler view by notifying of a change in dataSet items
+     * Updates recyclerView that an exercise has been inserted at the end of the display list
      */
     private fun updateRecyclerViewInsert() {
         recyclerView.adapter!!.notifyItemInserted(displayList.size - 1)

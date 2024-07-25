@@ -39,16 +39,14 @@ class RegimenManagementAdapter(private val localDataSet: ArrayList<Regimen>,
             }
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int)
-    : RegimenManagementAdapter.RegimenViewHolder {
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): RegimenViewHolder {
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.regimen_row_item, viewGroup, false)
         return RegimenViewHolder(view)
     }
 
-    override fun onBindViewHolder(viewHolder: RegimenManagementAdapter.RegimenViewHolder,
-                                  position: Int) {
+    override fun onBindViewHolder(viewHolder: RegimenViewHolder, position: Int) {
 
         // Get element from your dataset at this position and
         // replace the contents of the view with that element
