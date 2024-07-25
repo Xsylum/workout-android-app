@@ -2,16 +2,13 @@ package com.example.workoutapplication
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
-    private var nextPageButton: Button? = null
+    private lateinit var exerciseManagementButton: Button
+    private lateinit var regimenManagementButton: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -20,12 +17,22 @@ class MainActivity : AppCompatActivity() {
         val dataStoreSingleton = DataStoreSingleton.getInstance(this)
         val dataStoreHelper = DataStoreHelper(this, dataStoreSingleton.dataStore!!)
 
-        nextPageButton = findViewById<View>(R.id.nextPageButton) as Button
-        nextPageButton!!.setOnClickListener {
+        exerciseManagementButton = findViewById(R.id.btn_exerciseManagement)
+        exerciseManagementButton.setOnClickListener {
             startActivity(
                 Intent(
                     this@MainActivity,
                     ExerciseManagementActivity::class.java
+                )
+            )
+        }
+
+        regimenManagementButton = findViewById(R.id.btn_regimenManagement)
+        regimenManagementButton.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    RegimenManagementActivity::class.java
                 )
             )
         }

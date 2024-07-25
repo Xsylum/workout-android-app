@@ -18,14 +18,23 @@
         app:layout_constraintVertical_bias="0.1" />
 
     <Button
-        android:id="@+id/nextPageButton"
+        android:id="@+id/btn_exerciseManagement"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="150dp"
-        android:gravity="center_horizontal|center_vertical"
-        android:text="Move to next screen"
+        android:text="Move to Exercises"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView" />
+
+    <Button
+        android:id="@+id/btn_regimenManagement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Move to Regimens"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_exerciseManagement" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
