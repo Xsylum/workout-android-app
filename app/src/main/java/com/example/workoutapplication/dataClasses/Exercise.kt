@@ -8,9 +8,7 @@ import java.util.UUID
 
 class Exercise {
     // TODO: check uniqueness (unique name/description?)
-    var exerciseID: UUID? = null // Class with very low-probably of generating the same "unique ID"
-        private set
-    @JvmField
+    private lateinit var exerciseID: UUID // Class with very low-probably of generating the same "unique ID"
     var name: String? = null
     @JvmField
     var description: String? = null
@@ -18,12 +16,11 @@ class Exercise {
     var thumbnailID: String? = null // Passing the storing/loading of images onto the activity
 
     // Tag Methods
-    var tags // maybe switch this to pairs or a Tag class (tag name, reference to Tag)
+    private var tags // maybe switch this to pairs or a Tag class (tag name, reference to Tag)
             : LinkedList<String?>
-        private set
 
     private constructor() {
-        tags = LinkedList()
+        tags = LinkedList<String?>()
     }
 
     // Constructor for the creation of "new" exercises, with a name and description as the base
@@ -34,7 +31,7 @@ class Exercise {
         tags = LinkedList()
     }
 
-    constructor(uniqueID: String?, name: String?, description: String?) {
+    constructor(uniqueID: String, name: String?, description: String?) {
         exerciseID = UUID.fromString(uniqueID)
         this.name = name
         this.description = description

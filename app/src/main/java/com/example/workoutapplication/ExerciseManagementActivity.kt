@@ -1,6 +1,7 @@
 package com.example.workoutapplication
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -30,12 +31,16 @@ class ExerciseManagementActivity : AppCompatActivity(),
 
         // Retrieving exercise list from DataStore
         val exerciseListJson: String? = dataStoreHelper.getStringValue("ExerciseList");
-        jsonExerciseArray = if (exerciseListJson != null)
-            JSONArray(exerciseListJson) else JSONArray()
+        jsonExerciseArray = if (exerciseListJson != null) {
+            JSONArray(exerciseListJson)
+        } else JSONArray() // no preference exists yet for exercises
+
+        Log.d("JSONArray", exerciseListJson.toString())
 
         // Setting up Activity's list of exercises
         for (i in 0 ..< jsonExerciseArray.length()) {
             val exercise = Exercise.fromJsonString(jsonExerciseArray[i].toString())
+            Log.d("JSONArray Testing", exercise.toString())
             displayList.add(exercise)
         }
 
@@ -97,6 +102,13 @@ class ExerciseManagementActivity : AppCompatActivity(),
         dataStoreHelper.setStringValue("ExerciseList", jsonExerciseArray.toString())
     }
 
+    private fun dataStoreExerciseUpdate(e: Exercise, position:Int) {
+        val exerciseJsonString = e.toJsonString()
+
+        jsonExerciseArray.put(position, exerciseJsonString)
+        dataStoreHelper.setStringValue("ExerciseList", jsonExerciseArray.toString())
+    }
+
     private fun dataStoreExerciseDelete(position: Int) {
         jsonExerciseArray.remove(position)
         dataStoreHelper.setStringValue("ExerciseList", jsonExerciseArray.toString())
@@ -110,18 +122,25 @@ class ExerciseManagementActivity : AppCompatActivity(),
      */
     override fun onDialogPositiveClick(dialog: DialogFragment, position:Int) {
         val exerciseName: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseName)
-        val exerciseDesc: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseDescription)
+        val exerciseDesc: EditText = dialog.requireDialog()
+            .findViewById(R.id.et_exerciseDescription)
 
-        val newExercise = Exercise(exerciseName.text.toString(), exerciseDesc.text.toString())
+        // TODO change how dataStoreExerciseInsert works to allow updating an existing jsonString
+        // Creating a new object even if just updating to simplify dataStore insertion
         if (position == -1) {
+            val newExercise = Exercise(exerciseName.text.toString(), exerciseDesc.text.toString())
             displayList.add(newExercise)
             updateRecyclerViewInsert()
-        } else {
-            displayList[position] = newExercise
-            updateRecyclerViewItemEdit(position)
-        }
 
-        dataStoreExerciseInsert(newExercise) // TODO: this method have to be splitup to allow faster reordering of exercises in displayList
+            dataStoreExerciseInsert(newExercise)
+        } else {
+            val targetExercise = displayList[position]
+            targetExercise.name = exerciseName.text.toString()
+            targetExercise.description = exerciseDesc.text.toString()
+            updateRecyclerViewItemEdit(position)
+
+            dataStoreExerciseUpdate(targetExercise, position)
+        }
     }
 
     override fun onDialogNeutralClick(dialog: DialogFragment) { /** No Effect **/ }
