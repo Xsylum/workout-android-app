@@ -1,5 +1,6 @@
 package com.example.workoutapplication
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -31,7 +32,13 @@ class RegimenManagementActivity : AppCompatActivity(),
     override fun onListItemClick(position: Int) {
         val targetRegimen = displayList[position]
         Log.d("RegimenTesting", "Regimen = $targetRegimen")
-        // TODO have this open RegimenDesignActivity?
+
+        startActivity(
+            Intent(
+                this,
+                RegimenDesignActivity::class.java
+            )
+        )
     }
 
     private fun addNewRegimen(name: String = "TestRegimen", description: String = "TestDescription") {
