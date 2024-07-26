@@ -21,6 +21,41 @@ class Regimen {
         exerciseList = LinkedList<Exercise>()
     }
 
+    /**
+     * Construct a regimen from the simplified RegimenDataStore communication
+     * class as well as a list of the user's exercises
+     *
+     * The constructor will attempt to find RegimenDataStore's UUID Strings
+     * in the list of exercises, and will throw an error if these UUIDs are not found
+     */
+    constructor(regimen: RegimenDataStore, exercises: LinkedList<Exercise>) {
+        //TODO("Change LinkedList to a hashmap to speed up construction")
+        //TODO("Alternatively, keep exercise UUIDs instead, and only find the relevant exercises as needed")
+
+        try {
+            regimenID = UUID.fromString(regimen.regimenID)
+            name = regimen.name
+            description = regimen.description
+
+            for (exerciseID in regimen.exerciseIDList) {
+                var exerciseFound = false
+                exercises@ for (exercise in exercises) {
+                    if (exercise.exerciseID == UUID.fromString(exerciseID)) {
+                        exerciseList.add(exercise)
+                        exerciseFound = true
+                        break@exercises
+                    }
+                }
+
+                if (!exerciseFound) {
+                    throw IllegalArgumentException("Failed to find exercise with string ID $exerciseID")
+                }
+            }
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        }
+    }
+
     constructor(name: String, description:String) {
         regimenID = UUID.randomUUID()
         this.name = name
