@@ -48,7 +48,8 @@ class Regimen {
                 }
 
                 if (!exerciseFound) {
-                    throw IllegalArgumentException("Failed to find exercise with string ID $exerciseID")
+                    throw IllegalArgumentException("Failed to find exercise with string ID" +
+                            "$exerciseID for regimen with ID $regimenID")
                 }
             }
         } catch (e: IllegalArgumentException) {

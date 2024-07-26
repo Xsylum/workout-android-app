@@ -7,8 +7,11 @@ import android.util.Log
 import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.workoutapplication.dataClasses.Exercise
 import com.example.workoutapplication.dataClasses.Regimen
+import com.example.workoutapplication.dataClasses.RegimenDataStore
 import org.json.JSONArray
+import java.util.LinkedList
 
 class RegimenManagementActivity : AppCompatActivity(),
     RegimenManagementAdapter.RegimenRecyclerViewListener{
@@ -32,11 +35,35 @@ class RegimenManagementActivity : AppCompatActivity(),
             addNewRegimen()
         }
 
+        // Getting the json-list of exercises from DataStore
+        val exerciseListJson: String? = dataStoreHelper.getStringValue("ExerciseList")
+        val jsonExerciseArray = if (exerciseListJson != null) {
+            JSONArray(exerciseListJson)
+        } else JSONArray()
+
+        // Creating List of exercises from json for
+        // Regimen(RegimenDataStore, LinkedList<Exercises>)
+        val exerciseList = LinkedList<Exercise>()
+        for (i in 0 until jsonExerciseArray.length()) {
+            val exerciseJsonString = jsonExerciseArray.get(i).toString()
+            exerciseList.add(Exercise.fromJsonString(exerciseJsonString))
+        }
+
         // Getting the list of regimens from DataStore
         val regimenListJson: String? = dataStoreHelper.getStringValue("RegimenList")
         jsonRegimenArray = if (regimenListJson != null) {
             JSONArray(regimenListJson)
         } else JSONArray() // no preference exists yet for regimens
+
+        // Creating the regimens based on the json list
+        // and adding them to the display list
+        for (i in 0 until jsonRegimenArray.length()) {
+            val regimenJsonString = jsonRegimenArray.get(i).toString()
+            val dataStoreRegimen = RegimenDataStore.fromJsonString(regimenJsonString)
+            val regimen = Regimen(dataStoreRegimen, exerciseList)
+
+            displayList.add(regimen)
+        }
 
         // Setting up the recyclerView of regimens
         recyclerView = findViewById(R.id.rv_regimenList)
@@ -61,9 +88,18 @@ class RegimenManagementActivity : AppCompatActivity(),
 
         Log.d("RegimenTest", displayList.add(outputRegimen).toString())
         updateRecyclerViewInsert()
+        dataStoreRegimenInsert(outputRegimen, displayList.size)
     }
 
     private fun updateRecyclerViewInsert() {
         recyclerView.adapter!!.notifyItemInserted(displayList.size - 1)
+    }
+
+    /** DATA STORE METHODS **/
+    private fun dataStoreRegimenInsert(r: Regimen, position: Int) {
+        val regimenJsonString = r.toJsonString()
+
+        jsonRegimenArray.put(regimenJsonString)
+        dataStoreHelper.setStringValue("RegimenList", jsonRegimenArray.toString())
     }
 }
