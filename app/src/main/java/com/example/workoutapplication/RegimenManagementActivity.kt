@@ -65,6 +65,8 @@ class RegimenManagementActivity : AppCompatActivity(),
             displayList.add(regimen)
         }
 
+        Log.d("Testing", displayList.toString())
+
         // Setting up the recyclerView of regimens
         recyclerView = findViewById(R.id.rv_regimenList)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -75,24 +77,37 @@ class RegimenManagementActivity : AppCompatActivity(),
         val targetRegimen = displayList[position]
         Log.d("RegimenTesting", "Regimen = $targetRegimen")
 
-        startActivity(
-            Intent(
-                this,
-                RegimenDesignActivity::class.java
-            )
-        )
+        deleteRegimen(position)
+//        val intent = Intent(this, RegimenDesignActivity::class.java)
+//        intent.putExtra("TargetRegimen", targetRegimen.toJsonString())
+//        intent.putExtra("RegimenPosition", position)
+//
+//        startActivity(intent)
     }
 
     private fun addNewRegimen(name: String = "TestRegimen", description: String = "TestDescription") {
         val outputRegimen = Regimen(name, description)
+        displayList.add(outputRegimen)
 
-        Log.d("RegimenTest", displayList.add(outputRegimen).toString())
         updateRecyclerViewInsert()
-        dataStoreRegimenInsert(outputRegimen, displayList.size)
+        dataStoreRegimenInsert(outputRegimen, displayList.size - 1)
+    }
+
+    private fun deleteRegimen(position: Int): Regimen {
+        val targetRegimen = displayList.removeAt(position)
+
+        updateRecyclerViewDelete(position)
+        dataStoreRegimenDelete(position)
+
+        return targetRegimen
     }
 
     private fun updateRecyclerViewInsert() {
         recyclerView.adapter!!.notifyItemInserted(displayList.size - 1)
+    }
+
+    private fun updateRecyclerViewDelete(position: Int) {
+        recyclerView.adapter!!.notifyItemRemoved(position)
     }
 
     /** DATA STORE METHODS **/
@@ -100,6 +115,11 @@ class RegimenManagementActivity : AppCompatActivity(),
         val regimenJsonString = r.toJsonString()
 
         jsonRegimenArray.put(regimenJsonString)
+        dataStoreHelper.setStringValue("RegimenList", jsonRegimenArray.toString())
+    }
+
+    private fun dataStoreRegimenDelete(position: Int) {
+        jsonRegimenArray.remove(position)
         dataStoreHelper.setStringValue("RegimenList", jsonRegimenArray.toString())
     }
 }
