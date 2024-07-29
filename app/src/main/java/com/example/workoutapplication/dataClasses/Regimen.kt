@@ -15,11 +15,10 @@ class Regimen {
     private lateinit var regimenID: UUID
     var name: String? = null
     var description: String? = null
-    private var exerciseList = LinkedList<Exercise>(); //TODO("hold exerciseIDs, call for exercises when needed")
+    var exerciseList = ArrayList<Exercise>() //TODO("hold exerciseIDs, call for exercises when needed")
+        private set
 
-    private constructor() {
-        exerciseList = LinkedList<Exercise>()
-    }
+    private constructor()
 
     /**
      * Construct a regimen from the simplified RegimenDataStore communication
@@ -28,7 +27,7 @@ class Regimen {
      * The constructor will attempt to find RegimenDataStore's UUID Strings
      * in the list of exercises, and will throw an error if these UUIDs are not found
      */
-    constructor(regimen: RegimenDataStore, exercises: LinkedList<Exercise>) {
+    constructor(regimen: RegimenDataStore, exercises: List<Exercise>) {
         //TODO("Change LinkedList to a hashmap to speed up construction")
         //TODO("Alternatively, keep exercise UUIDs instead, and only find the relevant exercises as needed")
 

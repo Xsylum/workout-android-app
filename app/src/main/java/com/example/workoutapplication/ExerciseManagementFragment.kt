@@ -48,7 +48,7 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
-            val inflater = requireActivity().layoutInflater;
+            val inflater = requireActivity().layoutInflater
 
             // Inflating/setting the layout for the dialog
             // Parent view is null because its going in the dialog layout

@@ -77,12 +77,11 @@ class RegimenManagementActivity : AppCompatActivity(),
         val targetRegimen = displayList[position]
         Log.d("RegimenTesting", "Regimen = $targetRegimen")
 
-        deleteRegimen(position)
-//        val intent = Intent(this, RegimenDesignActivity::class.java)
-//        intent.putExtra("TargetRegimen", targetRegimen.toJsonString())
-//        intent.putExtra("RegimenPosition", position)
-//
-//        startActivity(intent)
+        val intent = Intent(this, RegimenDesignActivity::class.java)
+        intent.putExtra("TargetRegimen", targetRegimen.toJsonString())
+        intent.putExtra("RegimenPosition", position)
+
+        startActivity(intent)
     }
 
     private fun addNewRegimen(name: String = "TestRegimen", description: String = "TestDescription") {
