@@ -57,7 +57,7 @@ class ExerciseManagementActivity : AppCompatActivity(),
     }
 
     // TODO: prevent fragment from displaying when there is already a fragment on the screen
-    override fun onListItemClick(position: Int) {
+    override fun onListItemClick(adapter: ExerciseManagementAdapter, position: Int) {
         val targetExercise = displayList[position]
         showUpdateExerciseDialog(targetExercise.name!!, targetExercise.description!!, position)
     }

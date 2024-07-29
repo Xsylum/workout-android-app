@@ -14,8 +14,9 @@ class ExerciseManagementAdapter (private val localDataSet: ArrayList<Exercise>,
                                  private val listener: ExerciseRecyclerViewListener)
     : RecyclerView.Adapter<ExerciseViewHolder>() {
 
+    // TODO subclass to have one ListItemClick that requires adapter, other that doesn't?
     interface ExerciseRecyclerViewListener {
-        fun onListItemClick(position: Int)
+        fun onListItemClick(adapter:ExerciseManagementAdapter, position: Int)
     }
 
     // Providing a reference to type of views being used
@@ -43,7 +44,7 @@ class ExerciseManagementAdapter (private val localDataSet: ArrayList<Exercise>,
                 // NO_POSITION is returned if the user clicks a
                 // removed item while the animation is running
                 if (position != RecyclerView.NO_POSITION)
-                    listener.onListItemClick(position)
+                    listener.onListItemClick(this@ExerciseManagementAdapter, position)
             }
     }
 

@@ -12,6 +12,8 @@ import com.example.workoutapplication.dataClasses.RegimenDataStore
 import org.json.JSONArray
 import java.util.LinkedList
 
+
+// List difference code inspired by https://www.baeldung.com/kotlin/lists-difference
 class RegimenDesignActivity : AppCompatActivity(),
     ExerciseManagementAdapter.ExerciseRecyclerViewListener{
 
@@ -22,6 +24,7 @@ class RegimenDesignActivity : AppCompatActivity(),
     // Info regimen currently being modified
     private lateinit var regimen: Regimen
     private var dataStorePosition: Int = -1 // position where regimen is stored in RegimenList
+    private var exercisesNotInRegimen = ArrayList<Exercise>()
 
     // DataStore variables
     private val dataStoreSingleton = DataStoreSingleton.getInstance(this)
@@ -45,10 +48,19 @@ class RegimenDesignActivity : AppCompatActivity(),
         regimen = Regimen(regimenDataStore, exerciseList)
         displayList = regimen.exerciseList
 
+        // Create a new list of exercises which is = exerciseList - regimen.exerciseList
+        exercisesNotInRegimen = findListDifference(exerciseList, regimen.exerciseList)
+        Log.d("RegimenTesting", exercisesNotInRegimen.toString())
+
         // TODO Check that position != -1 [Try to also JUNIT test this]
         /** /Regimen data setup **/
 
         // Setting up the recyclerView to display exercises in this regimen
+        recyclerView = findViewById(R.id.rv_regimenExerciseList)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        // Reusing ExerciseManagementAdapter for simplicity
+        recyclerView.adapter = ExerciseManagementAdapter(displayList, this)
+
         recyclerView = findViewById(R.id.rv_regimenExerciseList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         // Reusing ExerciseManagementAdapter for simplicity
@@ -62,8 +74,14 @@ class RegimenDesignActivity : AppCompatActivity(),
         showAddExerciseDialog(exerciseList)
     }
 
-    override fun onListItemClick(position: Int) {
+    override fun onListItemClick(adapter:ExerciseManagementAdapter, position: Int) {
         TODO("Not yet implemented")
+    }
+
+    private fun findListDifference(userExercises: ArrayList<Exercise>,
+                                   regimenExercises: ArrayList<Exercise>): ArrayList<Exercise> {
+        val outputList = (userExercises - regimenExercises.toSet())
+        return ArrayList(outputList)
     }
 
     private fun getDataStoreExerciseList(): ArrayList<Exercise> {
@@ -87,4 +105,5 @@ class RegimenDesignActivity : AppCompatActivity(),
         val fragment = RegimenDesignAddExercisesFragment(userExercises)
         fragment.show(supportFragmentManager, "REGIMEN_ADD_EXERCISE_DIALOG")
     }
+
 }
