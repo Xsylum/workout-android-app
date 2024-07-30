@@ -1,5 +1,6 @@
 package com.example.workoutapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -25,20 +26,21 @@ class RegimenDesignActivity : AppCompatActivity(),
 
     // Info regimen currently being modified
     private lateinit var regimen: Regimen
-    private var dataStorePosition: Int = -1 // position where regimen is stored in RegimenList
     private var exercisesNotInRegimen = ArrayList<Exercise>()
 
     // DataStore variables
     private val dataStoreSingleton = DataStoreSingleton.getInstance(this)
     private val dataStoreHelper = DataStoreHelper(this, dataStoreSingleton.dataStore!!)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    private var regimenDataStorePosition: Int = -1 // position where regimen is stored in RegimenList
 
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_regimen_design)
 
         /** Regimen data setup **/
-        dataStorePosition = intent.getIntExtra("RegimenPosition", dataStorePosition)
+        regimenDataStorePosition = intent
+            .getIntExtra("RegimenPosition", regimenDataStorePosition)
         val regimenJson = intent.getStringExtra("TargetRegimen")
         val regimenDataStore = RegimenDataStore.fromJsonString(regimenJson)
 
@@ -48,7 +50,6 @@ class RegimenDesignActivity : AppCompatActivity(),
 
         // Finally, the regimen being designed can be initialized
         regimen = Regimen(regimenDataStore, exerciseList)
-        displayList = regimen.exerciseList
 
         //TODO add "You haven't added any exercises to this regimen yet" if displayList.size == 0
 
@@ -63,17 +64,23 @@ class RegimenDesignActivity : AppCompatActivity(),
         recyclerView = findViewById(R.id.rv_regimenExerciseList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         // Reusing ExerciseManagementAdapter for simplicity
-        recyclerView.adapter = ExerciseManagementAdapter(displayList, this)
-
-        recyclerView = findViewById(R.id.rv_regimenExerciseList)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        // Reusing ExerciseManagementAdapter for simplicity
-        recyclerView.adapter = ExerciseManagementAdapter(displayList, this)
+        recyclerView.adapter = ExerciseManagementAdapter(regimen.exerciseList, this)
 
         val addExerciseButton = findViewById<Button>(R.id.btn_regimenAddExercise)
         addExerciseButton.setOnClickListener() {
             showAddExerciseDialog(exercisesNotInRegimen)
         }
+    }
+
+    // TODO update this to non-deprecated function
+    override fun onBackPressed() {
+        super.onBackPressed()
+
+        val intent = Intent()
+        intent.putExtra("UPDATED_REGIMEN", regimen.toJsonString())
+        intent.putExtra("REGIMEN_POSITION", regimenDataStorePosition)
+        setResult(1, intent)
+        finish()
     }
 
     override fun onListItemClick(adapter:ExerciseManagementAdapter, position: Int) {
@@ -119,13 +126,38 @@ class RegimenDesignActivity : AppCompatActivity(),
         addNewExercisesToRegimen(addedExercises)
     }
 
+    /**
+     * Sequential method handling the required updates to the regimen's exercise list
+     * and calling an update on DataStore's list of regimens
+     */
     private fun addNewExercisesToRegimen(exercises: List<Exercise>) {
-        val startOfRange = displayList.size
+        val startOfRange = regimen.exerciseList.size
 
-        displayList += exercises
+        // update regimen's exercise list and notify the recycler view of additions
+        regimen.exerciseList += exercises
         recyclerView.adapter!!.notifyItemRangeInserted(startOfRange, exercises.size)
 
         exercisesNotInRegimen -= exercises.toSet()
+
+        updateDataStoreAddExercises()
+    }
+
+    private fun updateDataStoreAddExercises() {
+        val newJsonString = regimen.toJsonString()
+
+        Log.d("RegimenTesting", newJsonString)
+
+        // Get the complete list of regimens, and put the updated JsonString
+        // for this regimen in at the proper position
+        val listOfRegimens = JSONArray(dataStoreHelper.getStringValue("RegimenList"))
+        listOfRegimens.put(regimenDataStorePosition, newJsonString)
+
+        Log.d("RegimenTesting", dataStoreHelper.getStringValue("RegimenList")!!)
+
+        // Update the DataStore's regimen list
+        dataStoreHelper.setStringValue("RegimenList", listOfRegimens.toString())
+
+        Log.d("RegimenTesting", dataStoreHelper.getStringValue("RegimenList")!!)
     }
 
 }

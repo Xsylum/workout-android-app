@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.dataClasses.Exercise
@@ -17,8 +19,11 @@ class RegimenManagementActivity : AppCompatActivity(),
     RegimenManagementAdapter.RegimenRecyclerViewListener{
 
     private var displayList = ArrayList<Regimen>()
+    private var exerciseList = ArrayList<Exercise>()
     private lateinit var jsonRegimenArray: JSONArray
     private lateinit var recyclerView: RecyclerView
+
+    private lateinit var activityResultLaunch: ActivityResultLauncher<Intent>
 
     // DataStore to read/write RegimenList Preference
     private val dataStoreSingleton = DataStoreSingleton.getInstance(this)
@@ -27,8 +32,6 @@ class RegimenManagementActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_regimen_management)
-
-        val myRegimen = Regimen("hello", "goodbye")
 
         val addRegimenButton: Button = findViewById(R.id.btn_addRegimen)
         addRegimenButton.setOnClickListener {
@@ -43,7 +46,6 @@ class RegimenManagementActivity : AppCompatActivity(),
 
         // Creating List of exercises from json for
         // Regimen(RegimenDataStore, LinkedList<Exercises>)
-        val exerciseList = LinkedList<Exercise>()
         for (i in 0 until jsonExerciseArray.length()) {
             val exerciseJsonString = jsonExerciseArray.get(i).toString()
             exerciseList.add(Exercise.fromJsonString(exerciseJsonString))
@@ -65,6 +67,26 @@ class RegimenManagementActivity : AppCompatActivity(),
             displayList.add(regimen)
         }
 
+        // Setup the launcher which will process any future result from RegimenDesignActivity
+        activityResultLaunch = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {result ->
+            when (result.resultCode) {
+                // No Changes to the regimen
+                0 -> {}
+                // Regimen was altered
+                1 -> {
+                    val rDS = RegimenDataStore.fromJsonString(
+                        result.data?.getStringExtra("UPDATED_REGIMEN"))
+                    val updatedRegimen = Regimen(rDS, exerciseList)
+                    val regimenPosition = result.data?.getIntExtra("REGIMEN_POSITION", -1)!!
+
+                    displayList[regimenPosition] = updatedRegimen
+                }
+                else -> {}
+            }
+        }
+
         Log.d("Testing", displayList.toString())
 
         // Setting up the recyclerView of regimens
@@ -73,15 +95,27 @@ class RegimenManagementActivity : AppCompatActivity(),
         recyclerView.adapter = RegimenManagementAdapter(displayList, this)
     }
 
+    /**
+     * Called when resuming this activity, particularly from RegimenDesignActivity.
+     * For this reason, it ensures that this activity uses the most recent RegimenList
+     * stored in the DataStore
+     */
+    override fun onResume() {
+        super.onResume()
+
+
+    }
+
     override fun onListItemClick(position: Int) {
         val targetRegimen = displayList[position]
         Log.d("RegimenTesting", "Regimen = $targetRegimen")
 
+        // Create the intent for launching RegimenDesignActivity
         val intent = Intent(this, RegimenDesignActivity::class.java)
         intent.putExtra("TargetRegimen", targetRegimen.toJsonString())
         intent.putExtra("RegimenPosition", position)
 
-        startActivity(intent)
+        activityResultLaunch.launch(intent)
     }
 
     private fun addNewRegimen(name: String = "TestRegimen", description: String = "TestDescription") {
