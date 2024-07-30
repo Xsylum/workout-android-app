@@ -16,6 +16,16 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
     // that method in the activity which implements the interface)
     private lateinit var listener: ExerciseManagementDialogListener
 
+    // An activity instantiating this DialogFragment *must*
+    // implement this interface, allowing it to receive event callbacks
+    //
+    // The host can query this dialog using the passed DialogFragment
+    interface ExerciseManagementDialogListener {
+        fun onDialogPositiveClick(dialog: DialogFragment, listPosition: Int)
+        fun onDialogNeutralClick(dialog: DialogFragment)
+        fun onDialogNegativeClick(dialog: DialogFragment, listPosition: Int)
+    }
+
     /**
      * Called when this fragment is attached to the parameter context (activity)
      */
@@ -30,16 +40,6 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
             // Activity hosting this dialog doesn't implement the interface
             throw ClassCastException("$context must implement UpdateExerciseDialogListener")
         }
-    }
-
-    // An activity instantiating this DialogFragment *must*
-    // implement this interface, allowing it to receive event callbacks
-    //
-    // The host can query this dialog using the passed DialogFragment
-    interface ExerciseManagementDialogListener {
-        fun onDialogPositiveClick(dialog: DialogFragment, listPosition: Int)
-        fun onDialogNeutralClick(dialog: DialogFragment)
-        fun onDialogNegativeClick(dialog: DialogFragment, listPosition: Int)
     }
 
     /**

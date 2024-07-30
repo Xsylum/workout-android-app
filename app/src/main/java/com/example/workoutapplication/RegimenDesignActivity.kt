@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.dataClasses.Exercise
@@ -15,7 +16,8 @@ import java.util.LinkedList
 
 // List difference code inspired by https://www.baeldung.com/kotlin/lists-difference
 class RegimenDesignActivity : AppCompatActivity(),
-    ExerciseManagementAdapter.ExerciseRecyclerViewListener{
+    ExerciseManagementAdapter.ExerciseRecyclerViewListener,
+    RegimenDesignAddExercisesFragment.AddExercisesListener {
 
     // The list of data that is displayed by recyclerView
     private var displayList = ArrayList<Exercise>()
@@ -48,6 +50,8 @@ class RegimenDesignActivity : AppCompatActivity(),
         regimen = Regimen(regimenDataStore, exerciseList)
         displayList = regimen.exerciseList
 
+        //TODO add "You haven't added any exercises to this regimen yet" if displayList.size == 0
+
         // Create a new list of exercises which is = exerciseList - regimen.exerciseList
         exercisesNotInRegimen = findListDifference(exerciseList, regimen.exerciseList)
         Log.d("RegimenTesting", exercisesNotInRegimen.toString())
@@ -68,10 +72,8 @@ class RegimenDesignActivity : AppCompatActivity(),
 
         val addExerciseButton = findViewById<Button>(R.id.btn_regimenAddExercise)
         addExerciseButton.setOnClickListener() {
-            Log.d("myTest", "User Clicked add exercise!")
+            showAddExerciseDialog(exercisesNotInRegimen)
         }
-
-        showAddExerciseDialog(exerciseList)
     }
 
     override fun onListItemClick(adapter:ExerciseManagementAdapter, position: Int) {
@@ -104,6 +106,26 @@ class RegimenDesignActivity : AppCompatActivity(),
         // TODO maybe change this to a Bottom Sheet (pull up screen)
         val fragment = RegimenDesignAddExercisesFragment(userExercises)
         fragment.show(supportFragmentManager, "REGIMEN_ADD_EXERCISE_DIALOG")
+    }
+
+    /**
+     * After positive button click in fragment from showAddExerciseDialog(), grab the
+     * addedExercises list and call an update on this regimen's data holders
+     */
+    override fun onExerciseAddPositiveClick(dialog: DialogFragment) {
+        val addExercisesFragment = dialog as RegimenDesignAddExercisesFragment
+        val addedExercises = addExercisesFragment.addedExercises
+
+        addNewExercisesToRegimen(addedExercises)
+    }
+
+    private fun addNewExercisesToRegimen(exercises: List<Exercise>) {
+        val startOfRange = displayList.size
+
+        displayList += exercises
+        recyclerView.adapter!!.notifyItemRangeInserted(startOfRange, exercises.size)
+
+        exercisesNotInRegimen -= exercises.toSet()
     }
 
 }
