@@ -18,7 +18,8 @@ import java.util.LinkedList
 // List difference code inspired by https://www.baeldung.com/kotlin/lists-difference
 class RegimenDesignActivity : AppCompatActivity(),
     ExerciseManagementAdapter.ExerciseRecyclerViewListener,
-    RegimenDesignAddExercisesFragment.AddExercisesListener {
+    RegimenDesignAddExercisesFragment.AddExercisesListener,
+    RegimenRemoveExerciseFragment.RemoveExerciseListener {
 
     // The list of data that is displayed by recyclerView
     private var displayList = ArrayList<Exercise>()
@@ -84,7 +85,12 @@ class RegimenDesignActivity : AppCompatActivity(),
     }
 
     override fun onListItemClick(adapter:ExerciseManagementAdapter, position: Int) {
-        TODO("Not yet implemented")
+        val fragment = RegimenRemoveExerciseFragment(regimen.exerciseList[position].name!!, position)
+        fragment.show(supportFragmentManager, "REGIMEN_DELETE_EXERCISE_DIALOG")
+    }
+
+    override fun onRemoveExercisePositiveClick(dialog: DialogFragment, position:Int) {
+        removeExerciseFromRegimen(position)
     }
 
     private fun findListDifference(userExercises: ArrayList<Exercise>,
@@ -139,25 +145,35 @@ class RegimenDesignActivity : AppCompatActivity(),
 
         exercisesNotInRegimen -= exercises.toSet()
 
-        updateDataStoreAddExercises()
+        updateDataStore()
     }
 
-    private fun updateDataStoreAddExercises() {
-        val newJsonString = regimen.toJsonString()
+    private fun removeExerciseFromRegimen(position: Int) {
+        val removedExercise = regimen.exerciseList.removeAt(position)
+        recyclerView.adapter!!.notifyItemRemoved(position)
 
-        Log.d("RegimenTesting", newJsonString)
+        exercisesNotInRegimen.add(removedExercise)
+
+        updateDataStore()
+    }
+
+    /**
+     * Replaces previous version of this regimen held in DataStore with the JsonString
+     * of the current version.
+     *
+     * Because this merely replaces the held data with regimen's current data, this method
+     * can be used for updating any changes that solely effect this regimen's values
+     */
+    private fun updateDataStore() {
+        val regimenJsonString = regimen.toJsonString()
 
         // Get the complete list of regimens, and put the updated JsonString
         // for this regimen in at the proper position
         val listOfRegimens = JSONArray(dataStoreHelper.getStringValue("RegimenList"))
-        listOfRegimens.put(regimenDataStorePosition, newJsonString)
-
-        Log.d("RegimenTesting", dataStoreHelper.getStringValue("RegimenList")!!)
+        listOfRegimens.put(regimenDataStorePosition, regimenJsonString)
 
         // Update the DataStore's regimen list
         dataStoreHelper.setStringValue("RegimenList", listOfRegimens.toString())
-
-        Log.d("RegimenTesting", dataStoreHelper.getStringValue("RegimenList")!!)
     }
 
 }
