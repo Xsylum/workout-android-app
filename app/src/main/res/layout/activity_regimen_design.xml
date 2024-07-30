@@ -10,10 +10,11 @@
         android:id="@+id/tv_regimenDesignTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="40dp"
         android:text="Managing Regimen:"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintEnd_toStartOf="@id/btn_deleteRegimen"
+        app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,15 +27,34 @@
         app:layout_constraintStart_toStartOf="@id/tv_regimenDesignTitle"
         app:layout_constraintTop_toBottomOf="@id/tv_regimenDesignTitle" />
 
+    <TextView
+        android:id="@+id/tv_regimenRename"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Rename Regimen"
+        android:textColor="#2196F3"
+        app:layout_constraintStart_toStartOf="@id/tv_designRegimenName"
+        app:layout_constraintTop_toBottomOf="@id/tv_designRegimenName" />
+
     <Button
         android:id="@+id/btn_regimenAddExercise"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:text="Add Exercise to Regimen"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_designRegimenName" />
+        app:layout_constraintTop_toBottomOf="@id/tv_regimenRename" />
+
+    <Button
+        android:id="@+id/btn_deleteRegimen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:text="DELETE REGIMEN"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_regimenDesignTitle" />
 
     <TextView
         android:id="@+id/tv_regimenExercises"

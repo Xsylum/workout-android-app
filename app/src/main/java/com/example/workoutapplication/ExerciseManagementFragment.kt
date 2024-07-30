@@ -52,7 +52,7 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
 
             // Inflating/setting the layout for the dialog
             // Parent view is null because its going in the dialog layout
-            val layoutView = inflater.inflate(R.layout.update_exercise_layout, null)
+            val layoutView = inflater.inflate(R.layout.fragment_exercise_update_info, null)
             builder.setView(layoutView)
 
             // Setting the default EditText text contents, either empty for "Add Exercise" or

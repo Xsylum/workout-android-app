@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.dataClasses.Exercise
@@ -19,7 +21,8 @@ import java.util.LinkedList
 class RegimenDesignActivity : AppCompatActivity(),
     ExerciseManagementAdapter.ExerciseRecyclerViewListener,
     RegimenDesignAddExercisesFragment.AddExercisesListener,
-    RegimenRemoveExerciseFragment.RemoveExerciseListener {
+    RegimenRemoveExerciseFragment.RemoveExerciseListener,
+    RegimenUpdateFragment.RegimenUpdateListener {
 
     // The list of data that is displayed by recyclerView
     private var displayList = ArrayList<Exercise>()
@@ -61,6 +64,10 @@ class RegimenDesignActivity : AppCompatActivity(),
         // TODO Check that position != -1 [Try to also JUNIT test this]
         /** /Regimen data setup **/
 
+        setUpActivityViews()
+    }
+
+    private fun setUpActivityViews() {
         // Setting up the recyclerView to display exercises in this regimen
         recyclerView = findViewById(R.id.rv_regimenExerciseList)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -68,8 +75,18 @@ class RegimenDesignActivity : AppCompatActivity(),
         recyclerView.adapter = ExerciseManagementAdapter(regimen.exerciseList, this)
 
         val addExerciseButton = findViewById<Button>(R.id.btn_regimenAddExercise)
-        addExerciseButton.setOnClickListener() {
+        addExerciseButton.setOnClickListener {
             showAddExerciseDialog(exercisesNotInRegimen)
+        }
+
+        val deleteRegimenButton = findViewById<Button>(R.id.btn_deleteRegimen)
+        deleteRegimenButton.setOnClickListener {
+            TODO("not implemented")
+        }
+
+        val editRegimenInfoView = findViewById<TextView>(R.id.tv_regimenRename)
+        editRegimenInfoView.setOnClickListener {
+            showRegimenUpdateDialog(regimen.name!!, regimen.description!!)
         }
     }
 
@@ -174,6 +191,18 @@ class RegimenDesignActivity : AppCompatActivity(),
 
         // Update the DataStore's regimen list
         dataStoreHelper.setStringValue("RegimenList", listOfRegimens.toString())
+    }
+
+    private fun showRegimenUpdateDialog(name: String, description: String) {
+        val fragment = RegimenUpdateFragment(name, description)
+        fragment.show(supportFragmentManager, "REGIMEN_UPDATE_INFO_DIALOG")
+    }
+
+    override fun onRegimenUpdatePositiveClick(name: String, description: String) {
+        regimen.name = name
+        regimen.description = description
+
+        updateDataStore()
     }
 
 }

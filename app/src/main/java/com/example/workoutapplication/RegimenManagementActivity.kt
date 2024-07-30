@@ -16,7 +16,8 @@ import org.json.JSONArray
 import java.util.LinkedList
 
 class RegimenManagementActivity : AppCompatActivity(),
-    RegimenManagementAdapter.RegimenRecyclerViewListener{
+    RegimenManagementAdapter.RegimenRecyclerViewListener,
+    RegimenUpdateFragment.RegimenUpdateListener {
 
     private var displayList = ArrayList<Regimen>()
     private var exerciseList = ArrayList<Exercise>()
@@ -33,39 +34,8 @@ class RegimenManagementActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_regimen_management)
 
-        val addRegimenButton: Button = findViewById(R.id.btn_addRegimen)
-        addRegimenButton.setOnClickListener {
-            addNewRegimen()
-        }
-
-        // Getting the json-list of exercises from DataStore
-        val exerciseListJson: String? = dataStoreHelper.getStringValue("ExerciseList")
-        val jsonExerciseArray = if (exerciseListJson != null) {
-            JSONArray(exerciseListJson)
-        } else JSONArray()
-
-        // Creating List of exercises from json for
-        // Regimen(RegimenDataStore, LinkedList<Exercises>)
-        for (i in 0 until jsonExerciseArray.length()) {
-            val exerciseJsonString = jsonExerciseArray.get(i).toString()
-            exerciseList.add(Exercise.fromJsonString(exerciseJsonString))
-        }
-
-        // Getting the list of regimens from DataStore
-        val regimenListJson: String? = dataStoreHelper.getStringValue("RegimenList")
-        jsonRegimenArray = if (regimenListJson != null) {
-            JSONArray(regimenListJson)
-        } else JSONArray() // no preference exists yet for regimens
-
-        // Creating the regimens based on the json list
-        // and adding them to the display list
-        for (i in 0 until jsonRegimenArray.length()) {
-            val regimenJsonString = jsonRegimenArray.get(i).toString()
-            val dataStoreRegimen = RegimenDataStore.fromJsonString(regimenJsonString)
-            val regimen = Regimen(dataStoreRegimen, exerciseList)
-
-            displayList.add(regimen)
-        }
+        exerciseList = getUserExercises()
+        displayList = getUserRegimens()
 
         // Setup the launcher which will process any future result from RegimenDesignActivity
         activityResultLaunch = registerForActivityResult(
@@ -82,28 +52,66 @@ class RegimenManagementActivity : AppCompatActivity(),
                     val regimenPosition = result.data?.getIntExtra("REGIMEN_POSITION", -1)!!
 
                     displayList[regimenPosition] = updatedRegimen
+                    updateRecyclerViewRegimenUpdated(regimenPosition)
                 }
                 else -> {}
             }
         }
 
-        Log.d("Testing", displayList.toString())
+        setUpActivityViews()
+    }
 
+    private fun setUpActivityViews() {
         // Setting up the recyclerView of regimens
         recyclerView = findViewById(R.id.rv_regimenList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = RegimenManagementAdapter(displayList, this)
+
+        val addRegimenButton: Button = findViewById(R.id.btn_addRegimen)
+        addRegimenButton.setOnClickListener {
+            addNewRegimen()
+        }
     }
 
-    /**
-     * Called when resuming this activity, particularly from RegimenDesignActivity.
-     * For this reason, it ensures that this activity uses the most recent RegimenList
-     * stored in the DataStore
-     */
-    override fun onResume() {
-        super.onResume()
+    private fun getUserExercises(): ArrayList<Exercise> {
+        val outputList = ArrayList<Exercise>()
 
+        // Getting the json-list of exercises from DataStore
+        val exerciseListJson: String? = dataStoreHelper.getStringValue("ExerciseList")
+        val jsonExerciseArray = if (exerciseListJson != null) {
+            JSONArray(exerciseListJson)
+        } else JSONArray()
 
+        // Creating List of exercises from json for
+        // Regimen(RegimenDataStore, LinkedList<Exercises>)
+        for (i in 0 until jsonExerciseArray.length()) {
+            val exerciseJsonString = jsonExerciseArray.get(i).toString()
+            outputList.add(Exercise.fromJsonString(exerciseJsonString))
+        }
+
+        return outputList
+    }
+
+    private fun getUserRegimens(): ArrayList<Regimen> {
+        val outputList = ArrayList<Regimen>()
+
+        // Getting the list of regimens from DataStore
+        val regimenListJson: String? = dataStoreHelper.getStringValue("RegimenList")
+        jsonRegimenArray = if (regimenListJson != null) {
+            JSONArray(regimenListJson)
+        } else JSONArray() // no preference exists yet for regimens
+
+        // Creating the regimens based on the json list
+        // and adding them to the display list
+        for (i in 0 until jsonRegimenArray.length()) {
+            val regimenJsonString = jsonRegimenArray.get(i).toString()
+            val dataStoreRegimen = RegimenDataStore.fromJsonString(regimenJsonString)
+            val regimen = Regimen(dataStoreRegimen, exerciseList)
+
+            outputList.add(regimen)
+        }
+
+        return outputList
     }
 
     override fun onListItemClick(position: Int) {
@@ -119,11 +127,16 @@ class RegimenManagementActivity : AppCompatActivity(),
     }
 
     private fun addNewRegimen(name: String = "TestRegimen", description: String = "TestDescription") {
-        val outputRegimen = Regimen(name, description)
-        displayList.add(outputRegimen)
+        val fragment = RegimenUpdateFragment()
+        fragment.show(supportFragmentManager, "ADD_REGIMEN_DIALOG")
+    }
+
+    override fun onRegimenUpdatePositiveClick(name: String, description: String) {
+        val newRegimen = Regimen(name, description)
+        displayList.add(newRegimen)
 
         updateRecyclerViewInsert()
-        dataStoreRegimenInsert(outputRegimen, displayList.size - 1)
+        dataStoreRegimenInsert(newRegimen, displayList.size - 1)
     }
 
     private fun deleteRegimen(position: Int): Regimen {
@@ -141,6 +154,10 @@ class RegimenManagementActivity : AppCompatActivity(),
 
     private fun updateRecyclerViewDelete(position: Int) {
         recyclerView.adapter!!.notifyItemRemoved(position)
+    }
+
+    private fun updateRecyclerViewRegimenUpdated(position: Int) {
+        recyclerView.adapter!!.notifyItemChanged(position)
     }
 
     /** DATA STORE METHODS **/
