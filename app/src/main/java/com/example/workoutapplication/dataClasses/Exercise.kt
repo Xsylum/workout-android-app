@@ -7,7 +7,7 @@ import java.util.LinkedList
 import java.util.UUID
 
 class Exercise {
-    // TODO: check uniqueness (unique name/description?)
+    // TODO Ensure exercise is not in regimen before deletion!
     lateinit var exerciseID: UUID // Class with very low-probably of generating the same "unique ID"
         private set
     var name: String? = null

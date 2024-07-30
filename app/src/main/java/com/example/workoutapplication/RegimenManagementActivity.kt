@@ -42,6 +42,13 @@ class RegimenManagementActivity : AppCompatActivity(),
             ActivityResultContracts.StartActivityForResult()
         ) {result ->
             when (result.resultCode) {
+                // REGIMEN WAS DELETED
+                -1 -> {
+                    val deletedRegimenPosition = result.data
+                        ?.getIntExtra("DELETED_REGIMEN_POSITION", -1)!!
+
+                    deleteRegimen(deletedRegimenPosition)
+                }
                 // No Changes to the regimen
                 0 -> {}
                 // Regimen was altered

@@ -22,7 +22,8 @@ class RegimenDesignActivity : AppCompatActivity(),
     ExerciseManagementAdapter.ExerciseRecyclerViewListener,
     RegimenDesignAddExercisesFragment.AddExercisesListener,
     RegimenRemoveExerciseFragment.RemoveExerciseListener,
-    RegimenUpdateFragment.RegimenUpdateListener {
+    RegimenUpdateFragment.RegimenUpdateListener,
+    RegimenDeleteFragment.RegimenDeleteListener {
 
     // The list of data that is displayed by recyclerView
     private var displayList = ArrayList<Exercise>()
@@ -81,7 +82,7 @@ class RegimenDesignActivity : AppCompatActivity(),
 
         val deleteRegimenButton = findViewById<Button>(R.id.btn_deleteRegimen)
         deleteRegimenButton.setOnClickListener {
-            TODO("not implemented")
+            showRegimenDeleteDialog()
         }
 
         val editRegimenInfoView = findViewById<TextView>(R.id.tv_regimenRename)
@@ -98,6 +99,23 @@ class RegimenDesignActivity : AppCompatActivity(),
         intent.putExtra("UPDATED_REGIMEN", regimen.toJsonString())
         intent.putExtra("REGIMEN_POSITION", regimenDataStorePosition)
         setResult(1, intent)
+        finish()
+    }
+
+    private fun showRegimenDeleteDialog() {
+        val fragment = RegimenDeleteFragment(regimen.name!!)
+        fragment.show(supportFragmentManager, "DELETE_FRAGMENT_DIALOG")
+    }
+
+    /**
+     * Return to RegimenManagementActivity with deletion result_code.
+     *
+     * NOTE: RegimenManagementActivity is expected to deal with the deletion from dataStore!
+     */
+    override fun onRegimenDeletePositiveClick() {
+        val intent = Intent()
+        intent.putExtra("DELETED_REGIMEN_POSITION", regimenDataStorePosition)
+        setResult(-1, intent)
         finish()
     }
 
