@@ -7,12 +7,13 @@ import java.util.LinkedList
 import java.util.UUID
 
 class Exercise {
-    // TODO Ensure exercise is not in regimen before deletion!
+    // TODO ********** Ensure exercise is not in regimen before deletion! ***********
     lateinit var exerciseID: UUID // Class with very low-probably of generating the same "unique ID"
         private set
     var name: String? = null
     var description: String? = null
     var thumbnailID: String? = null // Passing the storing/loading of images onto the activity
+    var trackingMetrics = ArrayList<ExerciseMetric>()
 
     // Tag Methods
     private var tags // maybe switch this to pairs or a Tag class (tag name, reference to Tag)
@@ -52,6 +53,18 @@ class Exercise {
 
     fun addTag(tag: String?) {
         tags.add(tag)
+    }
+
+    fun addMetric(metric: ExerciseMetric) {
+        trackingMetrics.add(metric)
+    }
+
+    fun removeMetric(position: Int) {
+        trackingMetrics.removeAt(position)
+    }
+
+    fun removeMetric(metric: ExerciseMetric) {
+        trackingMetrics.remove(metric)
     }
 
     // JSON Methods
