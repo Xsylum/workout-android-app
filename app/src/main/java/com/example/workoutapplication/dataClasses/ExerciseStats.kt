@@ -19,7 +19,7 @@ class ExerciseStats (private val exercise: Exercise, private val partOfWorkout: 
     }
 
     private fun editSetMetricValue(set: Int, metricPosition: Int, newStringValue: String) {
-        metricStringData[set][metricPosition].second.stringValFormat = newStringValue
+        metricStringData[set][metricPosition].second.updateValue(newStringValue)
     }
 
     /**

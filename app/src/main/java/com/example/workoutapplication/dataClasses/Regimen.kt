@@ -102,16 +102,8 @@ class Regimen {
 
         } catch (e: JSONException) {
             e.printStackTrace()
-            return "Json conversion error for $regimenID"
+            return "Json conversion error for regimen $regimenID"
         }
         return jsonRegimen.toString()
-    }
-
-    companion object {
-
-        fun fromJsonString(jsonString: String?): Regimen {
-            //TODO("Not implemented")
-            throw NotImplementedError("Not yet Implemented!")
-        }
     }
 }
