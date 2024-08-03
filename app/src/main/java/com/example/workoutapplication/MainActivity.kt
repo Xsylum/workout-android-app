@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
     private lateinit var exerciseManagementButton: Button
     private lateinit var regimenManagementButton: Button
+    private lateinit var workoutLogManagementButton: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,6 +34,16 @@ class MainActivity : AppCompatActivity() {
                 Intent(
                     this,
                     RegimenManagementActivity::class.java
+                )
+            )
+        }
+
+        workoutLogManagementButton = findViewById(R.id.btn_workoutManagementDebug)
+        workoutLogManagementButton.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    WorkoutLogActivity::class.java
                 )
             )
         }
