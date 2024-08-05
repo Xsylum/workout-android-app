@@ -6,85 +6,29 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.UUID
 
-class ExerciseStats (private val exercise: Exercise,
-                     private val partOfWorkout: WorkoutLog,
-                     private val eStatsID: UUID = UUID.randomUUID()) {
+class ExerciseStats (val exercise: Exercise,
+                     val partOfWorkout: WorkoutLog,
+                     val eStatsID: UUID = UUID.randomUUID()) {
 
     private val trackingMetrics = exercise.trackingMetrics
 
-    // An array list holding multiple Sets (as in, "each set has x reps"),
-    // with each set pairing each metric from trackingMetrics to some datum
-    private val metricData = ArrayList<ExerciseSet>()
+    // metricDataGrid[position] gives the metric value for a single exercise set
+    // metricDataGrid[position][x] gives the metricValue for the x-th metric of the exercise
+    val metricDataGrid = ArrayList<ArrayList<ExerciseMetricValue>>()
 
-    /**
-     * Subclass for code clarity, representing an single exercise's set.
-     *
-     * When reading or writing to DataStore, this class is responsible for matching
-     * metric and metricValues string UUIDs with the relevant objects
-     */
-    internal inner class ExerciseSet: ArrayList<Pair<ExerciseMetric, ExerciseMetricValue>>() {
-        fun toJsonString(): String {
-            return try {
-                val jsonArray = JSONArray()
-
-                for ((metric, metricValue) in this) {
-                    // Using the below string template to avoid cost of performing
-                    // JSONArray(pair).toString() for each pair
-                    val arrayedInfo = "[\"${metric.metricID}\",${metricValue.metricValID}]"
-                    jsonArray.put(arrayedInfo)
-                }
-                jsonArray.toString()
-            } catch (e: JSONException) {
-                e.printStackTrace()
-                "Error converting ExerciseSet to jsonString!"
-            }
-        }
-
-        /**
-         * Replaces the contents of this ExerciseSet with the contents of
-         * the jsonString, with its UUIDs matched to the relevant ExerciseMetric
-         * or ExerciseMetricValue objects
-         *
-         * WARNING: This will PERMANENTLY WIPE the existing data of
-         * the ExerciseSet it is called on!
-         */
-        fun fillFromJsonString(jsonString: String,
-                                       metricList: List<ExerciseMetric>,
-                                       valueList: List<ExerciseMetricValue>) {
-            this.clear()
-            val jsonArray = JSONArray(jsonString)
-
-            for (i in 0..jsonArray.length()) {
-                // get the current pair from the overall array
-                val pairArray = JSONArray(jsonArray.get(i))
-
-                // find the metric & metricValue from respective lists with
-                // the uniqueIDs as listed in pairArray
-                val metric = metricList.first {m ->
-                    m.metricID == UUID.fromString(pairArray.get(0).toString())}
-                val metricValue = valueList.first {v ->
-                    v.metricValID == UUID.fromString(pairArray.get(1).toString())}
-
-                // Create the pair and add it to this ExerciseSet
-                val pair = Pair(metric, metricValue)
-                this.add(pair)
-            }
-        }
-
-    }
 
     private fun addEmptySet() {
         val newExerciseSet = basicExerciseSet()
 
-        metricData.add(newExerciseSet)
+        metricDataGrid.add(newExerciseSet)
     }
 
-    private fun addSet(set: ExerciseSet) {
-        metricData.add(set)
+    private fun addSet(set: ArrayList<ExerciseMetricValue>) {
+        metricDataGrid.add(set)
     }
 
     private fun editSetMetricValue(set: Int, metricPosition: Int, newStringValue: String) {
-        metricData[set][metricPosition].second.updateValue(newStringValue)
+        metricDataGrid[set][metricPosition].updateValue(newStringValue)
     }
 
     /**
@@ -94,18 +38,20 @@ class ExerciseStats (private val exercise: Exercise,
      * Each of the exercise metrics is paired with an empty String value,
      * allowing the values to be set by the user later on.
      */
-    private fun basicExerciseSet(): ExerciseSet {
-        val outputList = ExerciseSet()
+    private fun basicExerciseSet(): ArrayList<ExerciseMetricValue> {
+        val outputList = ArrayList<ExerciseMetricValue>()
 
         for (metric in trackingMetrics) {
             val metricValue = ExerciseMetricValue(format = if (metric.isTimeStat) 1 else 0)
-            val metricPair = Pair(metric, metricValue)
-            outputList.add(metricPair)
+            outputList.add(metricValue)
         }
 
         return outputList
     }
 
+    /**
+     * Converts this class to a parsed JSONString for DataStore usage
+     */
     fun toJsonString(): String {
         return try {
             val outputJson = JSONObject()
@@ -114,7 +60,16 @@ class ExerciseStats (private val exercise: Exercise,
             outputJson.put("Exercise", exercise.exerciseID)
             outputJson.put("Workout", partOfWorkout.workoutID)
 
-            val exerciseSetsJson = JSONArray(metricData)
+            val exerciseSetsJson = JSONArray()
+            for (exerciseSet in metricDataGrid) {
+                val exerciseSetJson = JSONArray()
+
+                for (metricValue in exerciseSet) {
+                    exerciseSetJson.put(metricValue.metricValID)
+                }
+
+                exerciseSetsJson.put(exerciseSet)
+            }
             outputJson.put("ExerciseSets", exerciseSetsJson.toString())
 
             outputJson.toString()
@@ -125,6 +80,10 @@ class ExerciseStats (private val exercise: Exercise,
     }
 
     companion object {
+        /**
+         * Creates an exercise based on the parsed jsonString obtained
+         * from ExerciseStats.toJsonString, mainly for usage with DataStore
+         */
         fun fromJsonString(jsonString: String,
                            exerciseList: List<Exercise>,
                            workoutList: List<WorkoutLog>,
@@ -138,16 +97,27 @@ class ExerciseStats (private val exercise: Exercise,
             val workoutID = jsonObject.get("Workout").toString()
             val workout = workoutList.first {w -> w.workoutID == UUID.fromString(workoutID)}
 
-            //Create the output ExerciseStats
+            // Create the output ExerciseStats
             val output = ExerciseStats(exercise, workout,
                 UUID.fromString(jsonObject.get("UniqueID").toString()))
 
             // Fill out the ExerciseStats sets
             val exerciseSets = JSONArray(jsonObject.get("ExerciseSets").toString())
             for (i in 0..exerciseSets.length()) {
-                val set = output.ExerciseSet()
-                set.fillFromJsonString(exerciseSets[i].toString(), metricList, valueList)
-                output.addSet(set)
+                val jsonArray = JSONArray(exerciseSets[i]) // get each set json
+                val newSet = ArrayList<ExerciseMetricValue>() // array of set's metricValues
+
+                // get metricValues from DataStore's list using ID, and add to the exercise set
+                for (i in 0..jsonArray.length()) {
+                    val metricValueID = jsonArray.get(i).toString()
+                    val metricValue = valueList.first {v ->
+                        v.metricValID == UUID.fromString(metricValueID)}
+
+                    newSet.add(metricValue)
+                }
+
+                // add the set to the output's array of sets
+                output.addSet(newSet)
             }
 
             return output

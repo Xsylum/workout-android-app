@@ -3,7 +3,6 @@ package com.example.workoutapplication.dataClasses
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.UUID
-import kotlin.time.Duration
 
 class ExerciseMetricValue {
 
@@ -12,10 +11,10 @@ class ExerciseMetricValue {
     var metricFormat = -1;
     var metricFormatMaxRange = 1;
 
-    var stringValFormat = ""
+    var valStringFormat = ""
         private set
-    private var numberValFormat: Double? = null // metric Format 0
-    private var timeValFormat: TimeDuration? = null // metric Format 1
+    private var valNumberFormat: Double? = null // metric Format 0
+    private var valTimeFormat: TimeDuration? = null // metric Format 1
 
     constructor(format: Int) {
         if (0 > format || format > metricFormatMaxRange) {
@@ -38,25 +37,25 @@ class ExerciseMetricValue {
 
         this.metricValID = metricValueID
         this.metricFormat = metricFormat
-        this.stringValFormat = stringValue
+        this.valStringFormat = stringValue
         when (metricFormat) {
-            0 -> numberValFormat = formatValue.toDouble()
-            1 -> timeValFormat = TimeDuration.fromParsedString(formatValue)
+            0 -> valNumberFormat = formatValue.toDouble()
+            1 -> valTimeFormat = TimeDuration.fromParsedString(formatValue)
         }
     }
 
     fun updateValue(stringValue: String) {
-        stringValFormat = stringValue
+        valStringFormat = stringValue
 
         // updating non-string value
         when (metricFormat) {
-            0 -> numberValFormat = stringValue.toDouble()
-            1 -> timeValFormat = TimeDuration.fromParsedString(stringValue)
+            0 -> valNumberFormat = stringValue.toDouble()
+            1 -> valTimeFormat = TimeDuration.fromParsedString(stringValue)
         }
     }
 
     fun getStringValue(): String {
-        return stringValFormat
+        return valStringFormat
     }
 
     /** Non-String Getters **/
@@ -66,7 +65,7 @@ class ExerciseMetricValue {
                     "(metricFormat = $metricFormat")
         }
 
-        return numberValFormat!!
+        return valNumberFormat!!
     }
 
     fun getTimeValue(): TimeDuration {
@@ -75,7 +74,7 @@ class ExerciseMetricValue {
                     "(metricFormat = $metricFormat")
         }
 
-        return timeValFormat!!
+        return valTimeFormat!!
     }
 
     /** DataStore Methods **/
@@ -85,10 +84,10 @@ class ExerciseMetricValue {
         try {
             jsonObject.put("UniqueID", metricValID)
             jsonObject.put("ValueFormat", metricFormat)
-            jsonObject.put("StringValue", stringValFormat)
+            jsonObject.put("StringValue", valStringFormat)
             jsonObject.put("FormatValue", when (metricFormat) {
-                                                    0 -> numberValFormat.toString()
-                                                    else -> timeValFormat.toString()
+                                                    0 -> valNumberFormat.toString()
+                                                    else -> valTimeFormat.toString()
                                                 })
         } catch (e: JSONException) {
             e.printStackTrace()
