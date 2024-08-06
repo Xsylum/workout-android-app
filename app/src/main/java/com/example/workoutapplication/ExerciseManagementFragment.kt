@@ -6,11 +6,17 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.workoutapplication.dataClasses.ExerciseMetric
 
-// TODO: cleanup or split this class to try and not avoid needing to pass listPosition during construction
+// TODO: Split constructor into two that take either an Exercise or nothing
 class ExerciseManagementFragment(private val exerciseName: String = "",
                                  private val exerciseDesc: String = "",
-                                 private val listPosition: Int = -1) : DialogFragment() {
+                                 val exerciseMetricList:
+                                    ArrayList<ExerciseMetric> = ArrayList(),
+                                 private val listPosition: Int = -1) : DialogFragment(),
+    ExerciseMetricManagementAdapter.ExerciseMetricRemoveViewListener {
 
     // Interface to deliver action events (calling listener.foo() will call
     // that method in the activity which implements the interface)
@@ -21,9 +27,9 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
     //
     // The host can query this dialog using the passed DialogFragment
     interface ExerciseManagementDialogListener {
-        fun onDialogPositiveClick(dialog: DialogFragment, listPosition: Int)
-        fun onDialogNeutralClick(dialog: DialogFragment)
-        fun onDialogNegativeClick(dialog: DialogFragment, listPosition: Int)
+        fun onDialogPositiveClick(dialog: ExerciseManagementFragment, listPosition: Int)
+        fun onDialogNeutralClick(dialog: ExerciseManagementFragment)
+        fun onDialogNegativeClick(dialog: ExerciseManagementFragment, listPosition: Int)
     }
 
     /**
@@ -62,6 +68,11 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
             val descriptionEditText: EditText = layoutView.findViewById(R.id.et_exerciseDescription)
             descriptionEditText.setText(exerciseDesc)
 
+            val metricRecyclerView: RecyclerView = layoutView.findViewById(R.id.rv_exerciseMetrics)
+            metricRecyclerView.layoutManager = LinearLayoutManager(context)
+            metricRecyclerView.adapter =
+                ExerciseMetricManagementAdapter(exerciseMetricList, this) // TODO LEFT OFF HERE
+
             // Positive and Neutral buttons exist when adding or updating an exercise
             builder.setPositiveButton("Confirm") {dialog, id ->
                     // Perform positive button consequences
@@ -86,6 +97,10 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
 
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    override fun onRemoveMetricViewClick(position: Int) {
+        TODO("Not yet implemented")
     }
 }
 

@@ -7,14 +7,12 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.dataClasses.Exercise
 import com.example.workoutapplication.dataClasses.Regimen
 import com.example.workoutapplication.dataClasses.RegimenDataStore
 import org.json.JSONArray
-import java.util.LinkedList
 
 
 // List difference code inspired by https://www.baeldung.com/kotlin/lists-difference

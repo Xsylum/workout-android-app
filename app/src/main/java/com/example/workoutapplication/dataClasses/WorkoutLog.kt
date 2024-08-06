@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
 
-class WorkoutLog (var date: LocalDate, val workoutID: UUID = UUID.randomUUID()) {
+class WorkoutLog (var date: LocalDate = LocalDate.now(), val workoutID: UUID = UUID.randomUUID()) {
     var timeOfCompletion: LocalTime? = null
         private set
     var workoutRegimen: Regimen? = null

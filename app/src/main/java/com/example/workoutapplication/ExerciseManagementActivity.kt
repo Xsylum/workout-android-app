@@ -10,6 +10,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.dataClasses.Exercise
+import com.example.workoutapplication.dataClasses.ExerciseMetric
 import org.json.JSONArray
 
 class ExerciseManagementActivity : AppCompatActivity(),
@@ -73,7 +74,7 @@ class ExerciseManagementActivity : AppCompatActivity(),
     private fun showUpdateExerciseDialog(exerciseName:String,
                                          exerciseDesc: String,
                                          listPosition: Int) {
-        val fragment = ExerciseManagementFragment(exerciseName, exerciseDesc, listPosition)
+        val fragment = ExerciseManagementFragment(exerciseName, exerciseDesc, listPosition = listPosition)
         fragment.show(supportFragmentManager, "EXERCISE_UPDATE_DIALOG")
     }
 
@@ -120,30 +121,31 @@ class ExerciseManagementActivity : AppCompatActivity(),
      * Executed when ExerciseManagementDialogListener broadcasts that the
      * fragment's positive button was clicked
      */
-    override fun onDialogPositiveClick(dialog: DialogFragment, position:Int) {
+    override fun onDialogPositiveClick(dialog: ExerciseManagementFragment, position:Int) {
         val exerciseName: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseName)
         val exerciseDesc: EditText = dialog.requireDialog()
             .findViewById(R.id.et_exerciseDescription)
+        val metricList: ArrayList<ExerciseMetric> = dialog.exerciseMetricList
 
-        // TODO change how dataStoreExerciseInsert works to allow updating an existing jsonString
-        // Creating a new object even if just updating to simplify dataStore insertion
-        if (position == -1) {
+        if (position == -1) { // Adding a new exercise
             val newExercise = Exercise(exerciseName.text.toString(), exerciseDesc.text.toString())
+            newExercise.trackingMetrics = metricList
             displayList.add(newExercise)
-            updateRecyclerViewInsert()
 
+            updateRecyclerViewInsert()
             dataStoreExerciseInsert(newExercise)
-        } else {
+        } else { // updating an existing exercise
             val targetExercise = displayList[position]
             targetExercise.name = exerciseName.text.toString()
             targetExercise.description = exerciseDesc.text.toString()
-            updateRecyclerViewItemEdit(position)
+            targetExercise.trackingMetrics = metricList
 
+            updateRecyclerViewItemEdit(position)
             dataStoreExerciseUpdate(targetExercise, position)
         }
     }
 
-    override fun onDialogNeutralClick(dialog: DialogFragment) { /** No Effect **/ }
+    override fun onDialogNeutralClick(dialog: ExerciseManagementFragment) { /** No Effect **/ }
 
     /**
      * Deletes an exercise from ExerciseList after using the update fragment
@@ -153,7 +155,7 @@ class ExerciseManagementActivity : AppCompatActivity(),
      * Note that the negative button only appears when attempting to edit an existing
      * exercise, never when adding a new one.
      */
-    override fun onDialogNegativeClick(dialog: DialogFragment, position: Int) {
+    override fun onDialogNegativeClick(dialog: ExerciseManagementFragment, position: Int) {
         val targetExercise = displayList[position]
 
         displayList.removeAt(position)
