@@ -14,7 +14,7 @@ import com.example.workoutapplication.dataClasses.Exercise
 import org.json.JSONArray
 
 class ExerciseManagementActivity : AppCompatActivity(),
-    ExerciseManagementFragment.ExerciseManagementDialogListener,
+    ExerciseManagementFragment.ExerciseManagementFragListener,
     ExerciseManagementAdapter.ExerciseRecyclerViewListener {
 
     private var displayList = ArrayList<Exercise>()
@@ -163,6 +163,14 @@ class ExerciseManagementActivity : AppCompatActivity(),
     private fun dataStoreExerciseDelete(position: Int) {
         jsonExerciseArray.remove(position)
         dataStoreHelper.setStringValue("ExerciseList", jsonExerciseArray.toString())
+    }
+
+    fun showAddMetricsFragment(listPosition: Int) {
+
+    }
+
+    override fun onAddMetricsClick(fragment: ExerciseManagementFragment, listPosition: Int) {
+        showAddMetricsFragment(listPosition)
     }
 
     /**

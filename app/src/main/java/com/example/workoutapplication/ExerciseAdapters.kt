@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.ExerciseManagementAdapter.ExerciseViewHolder
 import com.example.workoutapplication.ExerciseMetricManagementAdapter.ExerciseMetricViewHolder
+import com.example.workoutapplication.ExerciseMetricAdditionAdapter.ExerciseIncludeMetricViewHolder
 import com.example.workoutapplication.dataClasses.Exercise
 import com.example.workoutapplication.dataClasses.ExerciseMetric
 
@@ -126,6 +127,52 @@ class ExerciseMetricManagementAdapter(private val localDataSet: ArrayList<Exerci
                 listener.onRemoveMetricViewClick(metricPosition)
             }
         }
+    }
+
+    override fun getItemCount(): Int {
+        return localDataSet.size
+    }
+}
+
+class ExerciseMetricAdditionAdapter(private val localDataSet: ArrayList<ExerciseMetric>,
+                                      private val listener: ExerciseMetricAddListener)
+    : RecyclerView.Adapter<ExerciseIncludeMetricViewHolder>() {
+    interface ExerciseMetricAddListener {
+        fun onMetricClick(position: Int)
+    }
+
+    // Providing a reference to type of views being used
+    // (custom ViewHolder)
+    inner class ExerciseIncludeMetricViewHolder(view: View) : RecyclerView.ViewHolder(view),
+        View.OnClickListener {
+        val metricName: TextView
+        val metricFormat: TextView
+
+        // ViewHolder constructed using a given view (which it will hold)
+        init {
+            metricName = view.findViewById(R.id.tv_manageMetricName)
+            metricFormat = view.findViewById(R.id.tv_removeMetric)
+        }
+
+        override fun onClick(v: View?) {
+            listener.onMetricClick(adapterPosition)
+        }
+    }
+
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int)
+            : ExerciseIncludeMetricViewHolder {
+        // Create a new view, which defines the UI of the list item
+        val view = LayoutInflater.from(viewGroup.context)
+            .inflate(R.layout.exercise_metric_row_item, viewGroup, false)
+        return ExerciseIncludeMetricViewHolder(view)
+    }
+
+    // Adds/changes data in the ViewHolder (different views!)
+    override fun onBindViewHolder(viewHolder: ExerciseIncludeMetricViewHolder, position: Int) {
+
+        // Get element from your dataset at this position and
+        // replace the contents of the view with that element
+        viewHolder.metricName.text = localDataSet[position].metricName
     }
 
     override fun getItemCount(): Int {

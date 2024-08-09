@@ -1,40 +1,31 @@
 package com.example.workoutapplication
 
-import android.app.AlertDialog
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentFactory
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.workoutapplication.dataClasses.ExerciseMetric
 
 // TODO: Split constructor into two that take either an Exercise or nothing
-class ExerciseManagementFragment(private val exerciseName: String = "",
-                                 private val exerciseDesc: String = "",
-                                 val exerciseMetricList:
-                                    ArrayList<ExerciseMetric> = ArrayList(),
-                                 private val listPosition: Int = -1) : Fragment(),
+class ExerciseManagementFragment() : Fragment(),
     ExerciseMetricManagementAdapter.ExerciseMetricRemoveViewListener {
 
     // Interface to deliver action events (calling listener.foo() will call
     // that method in the activity which implements the interface)
-    private lateinit var listener: ExerciseManagementDialogListener
+    private lateinit var listener: ExerciseManagementFragListener
 
     // An activity instantiating this DialogFragment *must*
     // implement this interface, allowing it to receive event callbacks
     //
     // The host can query this dialog using the passed DialogFragment
-    interface ExerciseManagementDialogListener {
-        fun onDialogPositiveClick(dialog: ExerciseManagementFragment, listPosition: Int)
-        fun onDialogNeutralClick(dialog: ExerciseManagementFragment)
-        fun onDialogNegativeClick(dialog: ExerciseManagementFragment, listPosition: Int)
+    interface ExerciseManagementFragListener {
+        fun onAddMetricsClick(fragment: ExerciseManagementFragment, listPosition: Int)
+        fun onDialogPositiveClick(fragment: ExerciseManagementFragment, listPosition: Int)
+        fun onDialogNeutralClick(fragment: ExerciseManagementFragment)
+        fun onDialogNegativeClick(fragment: ExerciseManagementFragment, listPosition: Int)
     }
 
     /**
@@ -46,7 +37,7 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
         // Check that the hosting activity implements UpdateExerciseDialogListener
         try {
             // Should be able to cast the activity to the listener interface
-            listener = context as ExerciseManagementDialogListener
+            listener = context as ExerciseManagementFragListener
         } catch (e: ClassCastException) {
             // Activity hosting this dialog doesn't implement the interface
             throw ClassCastException("$context must implement UpdateExerciseDialogListener")
@@ -59,6 +50,11 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_exercise_update_info, container, false)
+
+        val addMetricsButton = view.findViewById<Button>(R.id.btn_addExerciseMetric)
+        addMetricsButton.setOnClickListener {
+            listener.onAddMetricsClick(this, arguments?.getInt("listPosition") ?: -1)
+        }
 
         try {
             val nameEditText = view.findViewById<EditText>(R.id.et_exerciseName)
