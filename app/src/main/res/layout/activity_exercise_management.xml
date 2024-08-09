@@ -38,4 +38,64 @@
         app:layout_constraintTop_toBottomOf="@id/btn_addExercise">
 
     </androidx.recyclerview.widget.RecyclerView>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/exerMan_leftFragGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.09" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/exerMan_topFragGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.06" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/exerMan_MidFragGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.500684" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/exerMan_botFragGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.94" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/exerMan_rightFragGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.91" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fcv_exerciseManageInfo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#8E7171"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/exerMan_MidFragGuideline"
+        app:layout_constraintEnd_toStartOf="@+id/exerMan_rightFragGuideline"
+        app:layout_constraintStart_toStartOf="@+id/exerMan_leftFragGuideline"
+        app:layout_constraintTop_toTopOf="@+id/exerMan_topFragGuideline" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fcv_exerciseAddableMetrics"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#8E7171"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/exerMan_botFragGuideline"
+        app:layout_constraintEnd_toStartOf="@+id/exerMan_rightFragGuideline"
+        app:layout_constraintStart_toStartOf="@+id/exerMan_leftFragGuideline"
+        app:layout_constraintTop_toTopOf="@+id/exerMan_MidFragGuideline" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

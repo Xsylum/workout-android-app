@@ -4,8 +4,13 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentFactory
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.dataClasses.ExerciseMetric
@@ -15,7 +20,7 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
                                  private val exerciseDesc: String = "",
                                  val exerciseMetricList:
                                     ArrayList<ExerciseMetric> = ArrayList(),
-                                 private val listPosition: Int = -1) : DialogFragment(),
+                                 private val listPosition: Int = -1) : Fragment(),
     ExerciseMetricManagementAdapter.ExerciseMetricRemoveViewListener {
 
     // Interface to deliver action events (calling listener.foo() will call
@@ -48,55 +53,24 @@ class ExerciseManagementFragment(private val exerciseName: String = "",
         }
     }
 
-    /**
-     * Defines the dialog container to be built using update_exercise_layout.xml
-     */
-    override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
-        return activity?.let {
-            val builder = AlertDialog.Builder(it)
-            val inflater = requireActivity().layoutInflater
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_exercise_update_info, container, false)
 
-            // Inflating/setting the layout for the dialog
-            // Parent view is null because its going in the dialog layout
-            val layoutView = inflater.inflate(R.layout.fragment_exercise_update_info, null)
-            builder.setView(layoutView)
+        try {
+            val nameEditText = view.findViewById<EditText>(R.id.et_exerciseName)
+            nameEditText.setText(requireArguments().getString("exerciseName"))
 
-            // Setting the default EditText text contents, either empty for "Add Exercise" or
-            // the existing data when updating an exercise (from the Fragment's constructor
-            val nameEditText: EditText = layoutView.findViewById(R.id.et_exerciseName)
-            nameEditText.setText(exerciseName)
-            val descriptionEditText: EditText = layoutView.findViewById(R.id.et_exerciseDescription)
-            descriptionEditText.setText(exerciseDesc)
+            val descEditText = view.findViewById<EditText>(R.id.et_exerciseDescription)
+            descEditText.setText(requireArguments().getString("exerciseDesc"))
+        } catch (_: IllegalStateException) {
+            // Fragment was run without arguments, meaning we are adding a brand new exercise
+        }
 
-            val metricRecyclerView: RecyclerView = layoutView.findViewById(R.id.rv_exerciseMetrics)
-            metricRecyclerView.layoutManager = LinearLayoutManager(context)
-            metricRecyclerView.adapter =
-                ExerciseMetricManagementAdapter(exerciseMetricList, this) // TODO LEFT OFF HERE
-
-            // Positive and Neutral buttons exist when adding or updating an exercise
-            builder.setPositiveButton("Confirm") {dialog, id ->
-                    // Perform positive button consequences
-                    listener.onDialogPositiveClick(this, listPosition)
-                }
-                .setNeutralButton("Cancel") { dialog, id ->
-                    listener.onDialogNeutralClick(this)
-
-                }
-
-            // Only when updating an existing exercise should the user be able to
-            // delete the exercise from the ExerciseList
-            if (listPosition != -1) {
-                builder.setMessage("Update Exercise")
-                    .setNegativeButton("Delete") { dialog, id ->
-                        // Inform the activity to perform the "negative action" method
-                        listener.onDialogNegativeClick(this, listPosition)
-                    }
-            } else {
-                builder.setMessage("Add New Exercise")
-            }
-
-            builder.create()
-        } ?: throw IllegalStateException("Activity cannot be null")
+        return view
     }
 
     override fun onRemoveMetricViewClick(position: Int) {

@@ -1,39 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_centerHorizontal="false">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_centerHorizontal="false"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="20dp">
 
     <EditText
         android:id="@+id/et_exerciseName"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:ems="10"
         android:hint="Exercise Name"
-        android:inputType="text" />
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/et_exerciseDescription"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/et_exerciseName"
-        android:layout_alignStart="@id/et_exerciseName"
-        android:layout_centerHorizontal="true"
         android:ems="10"
         android:hint="Exercise Description"
-        android:inputType="text" />
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="@+id/et_exerciseName"
+        app:layout_constraintStart_toStartOf="@+id/et_exerciseName"
+        app:layout_constraintTop_toBottomOf="@+id/et_exerciseName" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_exerciseMetrics"
-        android:layout_width="wrap_content"
+        android:id="@+id/recyclerViewAddedMetrics"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/et_exerciseDescription"
-        android:layout_alignStart="@id/et_exerciseDescription"
-        android:layout_alignEnd="@id/et_exerciseDescription"
-        android:layout_centerHorizontal="true">
+        app:layout_constraintEnd_toEndOf="@+id/et_exerciseDescription"
+        app:layout_constraintStart_toStartOf="@+id/et_exerciseDescription"
+        app:layout_constraintTop_toBottomOf="@+id/et_exerciseDescription">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -41,8 +43,8 @@
         android:id="@+id/btn_addExerciseMetric"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rv_exerciseMetrics"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="false"
-        android:text="Add Metric" />
-</RelativeLayout>
+        android:text="Add Metric"
+        app:layout_constraintEnd_toEndOf="@+id/recyclerViewAddedMetrics"
+        app:layout_constraintStart_toStartOf="@+id/recyclerViewAddedMetrics"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewAddedMetrics" />
+</androidx.constraintlayout.widget.ConstraintLayout>
