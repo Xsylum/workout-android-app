@@ -2,11 +2,8 @@ package com.example.workoutapplication
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
     private lateinit var exerciseManagementButton: Button
@@ -47,6 +44,16 @@ class MainActivity : AppCompatActivity() {
                 Intent(
                     this,
                     WorkoutLogActivity::class.java
+                )
+            )
+        }
+
+        val fragmentDebugButton = findViewById<Button>(R.id.btn_fragmentDebug)
+        fragmentDebugButton.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    FragmentTestingActivity::class.java
                 )
             )
         }

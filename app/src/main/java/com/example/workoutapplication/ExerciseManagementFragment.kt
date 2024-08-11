@@ -40,7 +40,7 @@ class ExerciseManagementFragment() : Fragment(),
             listener = context as ExerciseManagementFragListener
         } catch (e: ClassCastException) {
             // Activity hosting this dialog doesn't implement the interface
-            throw ClassCastException("$context must implement UpdateExerciseDialogListener")
+            throw ClassCastException("$context must implement ExerciseManagementFragListener")
         }
     }
 

@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Possible Metrics"
+        app:layout_constraintBottom_toTopOf="@+id/rv_addableMetrics"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/tv_addableMetricsClose"
         app:layout_constraintHorizontal_bias="0.5"
@@ -23,6 +24,7 @@
         android:layout_height="wrap_content"
         android:text="close/cancel X"
         android:textColor="#9E9E9E"
+        app:layout_constraintBottom_toTopOf="@+id/rv_addableMetrics"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/tv_addableMetricsTitle"
@@ -32,11 +34,75 @@
         android:id="@+id/rv_addableMetrics"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layout_addMetric"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_addableMetricsTitle">
 
     </androidx.recyclerview.widget.RecyclerView>
+
+    <LinearLayout
+        android:id="@+id/layout_addMetric"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tv_addNewMetric"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ Add New Metric"
+            android:textColor="#939393"
+            android:textSize="33sp"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/layout_metricDefinition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/et_newMetricName"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Name (&quot;Weight&quot;)"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/et_newMetricUnit"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Measurement Unit"
+                android:inputType="text" />
+
+            <CheckBox
+                android:id="@+id/check_newMetricTime"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="0"
+                android:text="isTime Stat" />
+
+            <TextView
+                android:id="@+id/tv_completeNewMetric"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="[ADD]"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
