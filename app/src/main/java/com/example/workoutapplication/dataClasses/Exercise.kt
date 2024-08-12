@@ -1,5 +1,6 @@
 package com.example.workoutapplication.dataClasses
 
+import android.util.Log
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -10,9 +11,9 @@ class Exercise {
     // TODO ********** Ensure exercise is not in regimen before deletion! ***********
     lateinit var exerciseID: UUID // Class with very low-probably of generating the same "unique ID"
         private set
-    var name: String? = null
-    var description: String? = null
-    var thumbnailID: String? = null // Passing the storing/loading of images onto the activity
+    var name: String = ""
+    var description: String = ""
+    var thumbnailID: String = "" // Passing the storing/loading of images onto the activity
     var trackingMetrics = ArrayList<ExerciseMetric>()
 
     // Tag Methods
@@ -24,14 +25,14 @@ class Exercise {
     }
 
     // Constructor for the creation of "new" exercises, with a name and description as the base
-    constructor(name: String?, description: String?) {
+    constructor(name: String, description: String) {
         exerciseID = UUID.randomUUID()
         this.name = name
         this.description = description
         tags = LinkedList()
     }
 
-    constructor(uniqueID: String, name: String?, description: String?) {
+    constructor(uniqueID: String, name: String, description: String) {
         exerciseID = UUID.fromString(uniqueID)
         this.name = name
         this.description = description
@@ -82,6 +83,12 @@ class Exercise {
             // JSONArray to hold exercise's tags
             val array = JSONArray(tags)
             jsonExercise.put("Tags", array)
+
+            val metricArray = JSONArray()
+            for (m in trackingMetrics) {
+                metricArray.put(m.metricID)
+            }
+            jsonExercise.put("MetricIDs", metricArray)
         } catch (e: JSONException) {
             e.printStackTrace()
             return "Json conversion error for $exerciseID"
@@ -93,9 +100,10 @@ class Exercise {
         /**
          * Exercise constructor which takes a JsonString, in the format of .toJsonString()
          * @param jsonString string with a json-style format to be converted
+         * @param metricList list of user defined metrics to match with stored metricIDs
          * @return an Exercise with attributes based on JsonString
          */
-        fun fromJsonString(jsonString: String?): Exercise {
+        fun fromJsonString(jsonString: String?, metricList: ArrayList<ExerciseMetric>): Exercise {
             val resultExercise = Exercise()
             try {
                 val jsonObject = JSONObject(jsonString)
@@ -109,6 +117,13 @@ class Exercise {
                     val tagsArray = JSONArray(jsonObject["Tags"].toString())
                     for (i in 0 until tagsArray.length()) {
                         resultExercise.addTag(tagsArray[i].toString())
+                    }
+
+                    val metricArray = JSONArray(jsonObject["MetricIDs"].toString())
+                    for (i in 0 until metricArray.length()) {
+                        val metric = metricList.first {m ->
+                            m.metricID == UUID.fromString(metricArray[i].toString())}
+                        resultExercise.addMetric(metric)
                     }
                 }
             } catch (e: JSONException) {

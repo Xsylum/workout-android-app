@@ -10,6 +10,7 @@ import android.widget.Spinner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.dataClasses.Exercise
+import com.example.workoutapplication.dataClasses.ExerciseMetric
 import com.example.workoutapplication.dataClasses.ExerciseStats
 import com.example.workoutapplication.dataClasses.Regimen
 import com.example.workoutapplication.dataClasses.RegimenDataStore
@@ -59,6 +60,19 @@ class WorkoutLogActivity : AppCompatActivity(),
     private fun getRegimenListFromDataStore(dataStoreHelper: DataStoreHelper): ArrayList<Regimen> {
         val regimenList = ArrayList<Regimen>()
 
+        // Retrieving user metric list from DataStore
+        val metricListJson: String? = dataStoreHelper.getStringValue("ExerciseMetricList")
+        val jsonMetricArray = if (metricListJson != null) {
+            JSONArray(metricListJson)
+        } else JSONArray()
+
+        // turn the jsonString metrics into a list of ExerciseMetric objects
+        val userMetricArray = ArrayList<ExerciseMetric>()
+        for (i in 0..< jsonMetricArray.length()) {
+            val metric = ExerciseMetric.fromJsonString(jsonMetricArray[i].toString())
+            userMetricArray.add(metric)
+        }
+
         // get the exercise list
         val exerciseListJson: String? = dataStoreHelper.getStringValue("ExerciseList")
         val jsonExerciseArray = if (exerciseListJson != null) {
@@ -67,7 +81,7 @@ class WorkoutLogActivity : AppCompatActivity(),
 
         val exerciseList = ArrayList<Exercise>()
         for (i in 0..< jsonExerciseArray.length()) {
-            val exercise = Exercise.fromJsonString(jsonExerciseArray[i].toString())
+            val exercise = Exercise.fromJsonString(jsonExerciseArray[i].toString(), userMetricArray)
             exerciseList.add(exercise)
         }
 

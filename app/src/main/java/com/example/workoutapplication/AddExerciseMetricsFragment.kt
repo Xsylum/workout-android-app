@@ -117,7 +117,6 @@ class AddExerciseMetricsFragment: Fragment(),
      * Inserts a selected metric in excludedMetricsRV to be added
      */
     override fun onMetricClick(position: Int) {
-        Log.d("Test", "clicked!")
         listener.onInsertMetricsClick(this, excludedMetrics[position])
 
         excludedMetrics.removeAt(position)

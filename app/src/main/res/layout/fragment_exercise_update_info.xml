@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_centerHorizontal="false"
@@ -32,10 +33,12 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_addedMetrics"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_addExerciseMetric"
         app:layout_constraintEnd_toEndOf="@+id/et_exerciseDescription"
         app:layout_constraintStart_toStartOf="@+id/et_exerciseDescription"
-        app:layout_constraintTop_toBottomOf="@+id/et_exerciseDescription">
+        app:layout_constraintTop_toBottomOf="@+id/et_exerciseDescription"
+        app:layout_constraintVertical_bias="0.0">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -44,7 +47,46 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add Metric"
+        app:layout_constraintBottom_toTopOf="@+id/layout_exerciseUpdateFinalization"
         app:layout_constraintEnd_toEndOf="@+id/rv_addedMetrics"
         app:layout_constraintStart_toStartOf="@+id/rv_addedMetrics"
-        app:layout_constraintTop_toBottomOf="@+id/rv_addedMetrics" />
+        app:layout_constraintTop_toBottomOf="@+id/rv_addedMetrics"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <RelativeLayout
+        android:id="@+id/layout_exerciseUpdateFinalization"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_addExerciseMetric">
+
+        <TextView
+            android:id="@+id/tv_deleteExercise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="Delete Exercise"
+            android:textColor="#D30000"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_cancelExerciseUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Cancel Update"
+            android:textColor="#0058DC" />
+
+        <TextView
+            android:id="@+id/tv_saveExerciseUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="Save Update"
+            android:textColor="#0058DC" />
+    </RelativeLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

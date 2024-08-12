@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.dataClasses.Exercise
+import com.example.workoutapplication.dataClasses.ExerciseMetric
 import com.example.workoutapplication.dataClasses.Regimen
 import com.example.workoutapplication.dataClasses.RegimenDataStore
 import org.json.JSONArray
@@ -83,6 +84,19 @@ class RegimenManagementActivity : AppCompatActivity(),
     private fun getUserExercises(): ArrayList<Exercise> {
         val outputList = ArrayList<Exercise>()
 
+        // Retrieving user metric list from DataStore
+        val metricListJson: String? = dataStoreHelper.getStringValue("ExerciseMetricList")
+        val jsonMetricArray = if (metricListJson != null) {
+            JSONArray(metricListJson)
+        } else JSONArray()
+
+        // turn the jsonString metrics into a list of ExerciseMetric objects
+        val userMetricArray = ArrayList<ExerciseMetric>()
+        for (i in 0..< jsonMetricArray.length()) {
+            val metric = ExerciseMetric.fromJsonString(jsonMetricArray[i].toString())
+            userMetricArray.add(metric)
+        }
+
         // Getting the json-list of exercises from DataStore
         val exerciseListJson: String? = dataStoreHelper.getStringValue("ExerciseList")
         val jsonExerciseArray = if (exerciseListJson != null) {
@@ -93,7 +107,7 @@ class RegimenManagementActivity : AppCompatActivity(),
         // Regimen(RegimenDataStore, LinkedList<Exercises>)
         for (i in 0 until jsonExerciseArray.length()) {
             val exerciseJsonString = jsonExerciseArray.get(i).toString()
-            outputList.add(Exercise.fromJsonString(exerciseJsonString))
+            outputList.add(Exercise.fromJsonString(exerciseJsonString, userMetricArray))
         }
 
         return outputList
