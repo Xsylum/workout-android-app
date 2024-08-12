@@ -30,7 +30,7 @@
         app:layout_constraintTop_toBottomOf="@+id/et_exerciseName" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewAddedMetrics"
+        android:id="@+id/rv_addedMetrics"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="@+id/et_exerciseDescription"
@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add Metric"
-        app:layout_constraintEnd_toEndOf="@+id/recyclerViewAddedMetrics"
-        app:layout_constraintStart_toStartOf="@+id/recyclerViewAddedMetrics"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerViewAddedMetrics" />
+        app:layout_constraintEnd_toEndOf="@+id/rv_addedMetrics"
+        app:layout_constraintStart_toStartOf="@+id/rv_addedMetrics"
+        app:layout_constraintTop_toBottomOf="@+id/rv_addedMetrics" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -150,6 +150,8 @@ class ExerciseMetricAdditionAdapter(private val localDataSet: ArrayList<Exercise
 
         // ViewHolder constructed using a given view (which it will hold)
         init {
+            view.setOnClickListener(this)
+
             metricName = view.findViewById(R.id.tv_metricName)
             metricFormat = view.findViewById(R.id.tv_metricValueFormat)
         }

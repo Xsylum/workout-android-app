@@ -21,6 +21,8 @@ class ExerciseManagementActivity : AppCompatActivity(),
     ExerciseManagementAdapter.ExerciseRecyclerViewListener,
     AddExerciseMetricsFragment.AddMetricsFragListener {
 
+    private lateinit var jsonMetricArray: JSONArray
+
     private var displayList = ArrayList<Exercise>()
     private lateinit var jsonExerciseArray: JSONArray
     private lateinit var recyclerView: RecyclerView
@@ -40,6 +42,12 @@ class ExerciseManagementActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_management)
+
+        // Retrieving user metric list from DataStore
+        val metricListJson: String? = dataStoreHelper.getStringValue("ExerciseMetricList")
+        jsonMetricArray = if (metricListJson != null) {
+            JSONArray(metricListJson)
+        } else JSONArray()
 
         // Retrieving exercise list from DataStore
         val exerciseListJson: String? = dataStoreHelper.getStringValue("ExerciseList");
@@ -78,7 +86,7 @@ class ExerciseManagementActivity : AppCompatActivity(),
         // display exercise update fragment only if there is no fragment on screen
         if (currentState == ActivityStates.DEFAULT) {
             val targetExercise = displayList[position]
-            showUpdateExerciseFragment(targetExercise.name!!, targetExercise.description!!, position)
+            showUpdateExerciseFragment(targetExercise, position)
         }
     }
 
@@ -94,14 +102,13 @@ class ExerciseManagementActivity : AppCompatActivity(),
         changeActivityState(ActivityStates.UPDATE_FRAGMENT)
     }
 
-    private fun showUpdateExerciseFragment(exerciseName:String,
-                                         exerciseDesc: String,
-                                         listPosition: Int) {
+    private fun showUpdateExerciseFragment(e: Exercise, listPosition: Int) {
         //val fragment = ExerciseManagementFragment(exerciseName, exerciseDesc, listPosition = listPosition)
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            val bundle = Bundle().apply { this.putString("exerciseName", exerciseName);
-                this.putString("exerciseDesc", exerciseDesc); this.putInt("position", listPosition)}
+            val bundle = Bundle().apply { this.putString("exerciseName", e.name);
+                this.putString("exerciseDesc", e.description); this.putInt("position", listPosition)
+                this.putSerializable("exerciseMetrics", e.trackingMetrics)}
             add<ExerciseManagementFragment>(exerciseUpdateFCV.id, "exerciseUpdate", bundle)
             addToBackStack("closeExerciseUpdate")
         }
@@ -169,20 +176,38 @@ class ExerciseManagementActivity : AppCompatActivity(),
         dataStoreHelper.setStringValue("ExerciseList", jsonExerciseArray.toString())
     }
 
-    private fun showAddMetricsFragment(listPosition: Int) {
-        var excludedMetrics: ArrayList<ExerciseMetric> =
-            if (listPosition == -1) {
-                ArrayList()
+    private fun dataStoreCreateMetric(m: ExerciseMetric) {
+        val jsonMetric = m.toJsonString()
+
+        jsonMetricArray.put(jsonMetric)
+        dataStoreHelper.setStringValue("ExerciseMetricList", jsonMetricArray.toString())
+    }
+
+    private fun showAddMetricsFragment(exerciseListPosition: Int) {
+
+        // turn the jsonString metrics into a list of ExerciseMetric objects
+        val userMetrics = ArrayList<ExerciseMetric>()
+        for (i in 0..< jsonMetricArray.length()) {
+            val metric = ExerciseMetric.fromJsonString(jsonMetricArray[i].toString())
+            userMetrics.add(metric)
+        }
+
+        // TODO get the exercise's metrics from ExerciseManagementFragment, allowing updates to be cancelled, + reopening Add Metrics won't duplicate metrics
+        // get the list of exercise metrics not included in this current exercise
+        val excludedMetrics: ArrayList<ExerciseMetric> =
+            if (exerciseListPosition == -1) {
+                userMetrics
             } else {
-                val targetExercise = displayList[listPosition]
-                val userMetrics = ArrayList<ExerciseMetric>() //TODO
+                val targetExercise = displayList[exerciseListPosition]
                 ArrayList(userMetrics - targetExercise.trackingMetrics.toSet())
             }
 
-
+        // open the metric management fragment
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            val bundle = Bundle().apply { this.putSerializable("excludedMetrics", excludedMetrics)}
+            // pass the metrics not-included in the exercise
+            val bundle = Bundle().apply { this.putSerializable("excludedMetrics", excludedMetrics)
+                this.putInt("exerciseListPosition", exerciseListPosition)}
             add<AddExerciseMetricsFragment>(addableMetricsFCV.id,
                 "exerciseAddableMetrics", bundle)
             addToBackStack("closeExerciseMetrics")
@@ -191,10 +216,45 @@ class ExerciseManagementActivity : AppCompatActivity(),
         changeActivityState(ActivityStates.METRIC_FRAGMENT)
     }
 
+    /**
+     * Open the metric management fragment due to the user wanting to add new
+     * tracking metrics to a given exercise (from that exercise's management fragment)
+     */
     override fun onAddMetricsClick(fragment: ExerciseManagementFragment, listPosition: Int) {
         if (currentState == ActivityStates.UPDATE_FRAGMENT) {
             showAddMetricsFragment(listPosition)
         }
+    }
+
+    override fun onInsertMetricsClick(frag: AddExerciseMetricsFragment, metric: ExerciseMetric) {
+        val updateFrag = supportFragmentManager.findFragmentByTag("exerciseUpdate")
+                as ExerciseManagementFragment
+        updateFrag.insertNewMetricToExercise(metric)
+    }
+
+    override fun onCloseAddMetricsClick(frag: AddExerciseMetricsFragment) {
+        supportFragmentManager.popBackStack("closeExerciseMetrics", 0)
+        changeActivityState(ActivityStates.UPDATE_FRAGMENT)
+    }
+
+    /**
+     * Create a new (not-assigned) ExerciseMetric when AddExerciseMetricsFragment sends
+     * a signal that the new metric's data is available
+     */
+    override fun onCreateMetricClick(frag: AddExerciseMetricsFragment) {
+        // new metric data
+        val newMetricName = frag.requireActivity()
+            .findViewById<EditText>(R.id.et_newMetricName).text.toString()
+        val newMetricUnit = frag.requireActivity()
+            .findViewById<EditText>(R.id.et_newMetricUnit).text.toString()
+        val isTimeStat = frag.requireActivity()
+            .findViewById<CheckBox>(R.id.check_newMetricTime).isChecked
+
+        // create the new metric
+        val outputMetric = ExerciseMetric(newMetricName, isTimeStat, newMetricUnit)
+
+        frag.addCreatedMetric(outputMetric)
+        dataStoreCreateMetric(outputMetric)
     }
 
     /**
@@ -207,26 +267,26 @@ class ExerciseManagementActivity : AppCompatActivity(),
         /**
         val exerciseName: EditText = dialog.requireDialog().findViewById(R.id.et_exerciseName)
         val exerciseDesc: EditText = dialog.requireDialog()
-            .findViewById(R.id.et_exerciseDescription)
+        .findViewById(R.id.et_exerciseDescription)
         val metricList: ArrayList<ExerciseMetric> = dialog.exerciseMetricList
 
         if (position == -1) { // Adding a new exercise
-            val newExercise = Exercise(exerciseName.text.toString(), exerciseDesc.text.toString())
-            newExercise.trackingMetrics = metricList
-            displayList.add(newExercise)
+        val newExercise = Exercise(exerciseName.text.toString(), exerciseDesc.text.toString())
+        newExercise.trackingMetrics = metricList
+        displayList.add(newExercise)
 
-            updateRecyclerViewInsert()
-            dataStoreExerciseInsert(newExercise)
+        updateRecyclerViewInsert()
+        dataStoreExerciseInsert(newExercise)
         } else { // updating an existing exercise
-            val targetExercise = displayList[position]
-            targetExercise.name = exerciseName.text.toString()
-            targetExercise.description = exerciseDesc.text.toString()
-            targetExercise.trackingMetrics = metricList
+        val targetExercise = displayList[position]
+        targetExercise.name = exerciseName.text.toString()
+        targetExercise.description = exerciseDesc.text.toString()
+        targetExercise.trackingMetrics = metricList
 
-            updateRecyclerViewItemEdit(position)
-            dataStoreExerciseUpdate(targetExercise, position)
+        updateRecyclerViewItemEdit(position)
+        dataStoreExerciseUpdate(targetExercise, position)
         }
-        */
+         */
     }
 
     override fun onDialogNeutralClick(dialog: ExerciseManagementFragment) { /** No Effect **/ }
@@ -246,27 +306,5 @@ class ExerciseManagementActivity : AppCompatActivity(),
         updateRecyclerViewDelete(position)
 
         dataStoreExerciseDelete(position)
-    }
-
-    override fun onInsertMetricsClick(frag: AddExerciseMetricsFragment, listPosition: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onCloseAddMetricsClick(frag: AddExerciseMetricsFragment, listPosition: Int) {
-        supportFragmentManager.popBackStack("closeExerciseMetrics", 0)
-        changeActivityState(ActivityStates.UPDATE_FRAGMENT)
-    }
-
-    override fun onCreateMetricClick(frag: AddExerciseMetricsFragment) {
-        val newMetricName = frag.requireActivity()
-            .findViewById<EditText>(R.id.et_newMetricName).text.toString()
-        val newMetricUnit = frag.requireActivity()
-            .findViewById<EditText>(R.id.et_newMetricUnit).text.toString()
-
-        val isTimeStat = frag.requireActivity()
-            .findViewById<CheckBox>(R.id.check_newMetricTime).isChecked
-
-        val outputMetric = ExerciseMetric(newMetricName, isTimeStat, newMetricUnit)
-        frag.addCreatedMetric(outputMetric)
     }
 }

@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.workoutapplication.dataClasses.ExerciseMetric
 
 // TODO: Split constructor into two that take either an Exercise or nothing
 class ExerciseManagementFragment() : Fragment(),
@@ -16,6 +19,9 @@ class ExerciseManagementFragment() : Fragment(),
     // Interface to deliver action events (calling listener.foo() will call
     // that method in the activity which implements the interface)
     private lateinit var listener: ExerciseManagementFragListener
+
+    private var metricList = ArrayList<ExerciseMetric>()
+    private lateinit var metricListRV: RecyclerView
 
     // An activity instantiating this DialogFragment *must*
     // implement this interface, allowing it to receive event callbacks
@@ -62,11 +68,23 @@ class ExerciseManagementFragment() : Fragment(),
 
             val descEditText = view.findViewById<EditText>(R.id.et_exerciseDescription)
             descEditText.setText(requireArguments().getString("exerciseDesc"))
+
+            metricList = requireArguments().getSerializable("exerciseMetrics")
+                    as ArrayList<ExerciseMetric>
         } catch (_: IllegalStateException) {
             // Fragment was run without arguments, meaning we are adding a brand new exercise
         }
 
+        metricListRV = view.findViewById(R.id.rv_addedMetrics)
+        metricListRV.layoutManager = LinearLayoutManager(context)
+        metricListRV.adapter = ExerciseMetricManagementAdapter(metricList, this)
+
         return view
+    }
+
+    fun insertNewMetricToExercise(metric: ExerciseMetric) {
+        metricList.add(metric)
+        metricListRV.adapter!!.notifyItemInserted(metricList.size - 1)
     }
 
     override fun onRemoveMetricViewClick(position: Int) {

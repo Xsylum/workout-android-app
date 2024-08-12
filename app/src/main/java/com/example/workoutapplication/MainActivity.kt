@@ -47,15 +47,5 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }
-
-        val fragmentDebugButton = findViewById<Button>(R.id.btn_fragmentDebug)
-        fragmentDebugButton.setOnClickListener {
-            startActivity(
-                Intent(
-                    this,
-                    FragmentTestingActivity::class.java
-                )
-            )
-        }
     }
 }

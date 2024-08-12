@@ -3,6 +3,7 @@ package com.example.workoutapplication
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,8 +24,8 @@ class AddExerciseMetricsFragment: Fragment(),
     private lateinit var excludedMetricsRV: RecyclerView
 
     interface AddMetricsFragListener {
-        fun onInsertMetricsClick(frag: AddExerciseMetricsFragment, listPosition: Int)
-        fun onCloseAddMetricsClick(frag: AddExerciseMetricsFragment, listPosition: Int)
+        fun onInsertMetricsClick(frag: AddExerciseMetricsFragment, metric: ExerciseMetric)
+        fun onCloseAddMetricsClick(frag: AddExerciseMetricsFragment)
         fun onCreateMetricClick(frag: AddExerciseMetricsFragment)
     }
 
@@ -50,12 +51,11 @@ class AddExerciseMetricsFragment: Fragment(),
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_exercise_add_metric, container, false)
-        val listPos = arguments?.getInt("listPosition") ?: -1
 
         // close fragment button
         val closeFragTextView = view.findViewById<TextView>(R.id.tv_addableMetricsClose)
         closeFragTextView.setOnClickListener {
-            listener.onCloseAddMetricsClick(this, listPos)
+            listener.onCloseAddMetricsClick(this)
         }
 
         // optional pre-existing metrics list
@@ -113,8 +113,12 @@ class AddExerciseMetricsFragment: Fragment(),
         excludedMetricsRV.adapter!!.notifyItemInserted(excludedMetrics.size - 1)
     }
 
+    /**
+     * Inserts a selected metric in excludedMetricsRV to be added
+     */
     override fun onMetricClick(position: Int) {
-        listener.onInsertMetricsClick(this, position)
+        Log.d("Test", "clicked!")
+        listener.onInsertMetricsClick(this, excludedMetrics[position])
 
         excludedMetrics.removeAt(position)
         excludedMetricsRV.adapter!!.notifyItemRemoved(position)
