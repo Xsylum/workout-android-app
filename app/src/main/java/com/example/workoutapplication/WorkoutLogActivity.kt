@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,9 +17,9 @@ import com.example.workoutapplication.dataClasses.Regimen
 import com.example.workoutapplication.dataClasses.RegimenDataStore
 import com.example.workoutapplication.dataClasses.WorkoutLog
 import org.json.JSONArray
+import java.util.LinkedList
 
-class WorkoutLogActivity : AppCompatActivity(),
-    AdapterView.OnItemSelectedListener {
+class WorkoutLogActivity : AppCompatActivity() {
 
     private lateinit var regimenList: ArrayList<Regimen>
     private var workout = WorkoutLog()
@@ -34,14 +35,32 @@ class WorkoutLogActivity : AppCompatActivity(),
 
         // Regimen Spinner Setup
         regimenList = getRegimenListFromDataStore(dataStoreHelper)
-        val spinnerRegimenList = regimenList.map {regimen -> regimen.name!!}
-        val regimenSpinner = findViewById<Spinner>(R.id.spin_workoutLogRegimen)
+        val spinnerRegimenList = regimenList.map {regimen -> regimen.name!!} as ArrayList<String>
+            spinnerRegimenList.add(0, "Please Select a Regimen")
 
-        ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerRegimenList)
-           .also { adapter ->
-               adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-               regimenSpinner.adapter = adapter
-           }
+        val regimenSpinner = findViewById<Spinner>(R.id.spin_workoutLogRegimen)
+        val regimenSpinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerRegimenList)
+        regimenSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        regimenSpinner.adapter = regimenSpinnerAdapter
+
+        regimenSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                if (position == 0) { workout.workoutRegimen = null }
+                    else { workout.workoutRegimen = regimenList[position - 1] }
+
+                // TODO currently adding temp exercise sets in below method, include a button to add them dynamically!
+                workout.replaceExerciseStatsForNewRegimen()
+                exerciseStatsRV.adapter!!.notifyDataSetChanged()
+
+                for (exerciseStat in workout.exerciseStats) {
+                    Log.d("Testing", exerciseStat.metricDataGrid.toString())
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+        }
 
         // ExerciseStat List setup
         exerciseStatsRV = findViewById<RecyclerView>(R.id.rv_workoutExerciseStats)
@@ -49,14 +68,6 @@ class WorkoutLogActivity : AppCompatActivity(),
         exerciseStatsRV.adapter = ExerciseStatAdapter(workout.exerciseStats)
     }
 
-    override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-        workout.workoutRegimen = regimenList[position]
-        exerciseStatsRV.adapter!!.notifyDataSetChanged()
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-
-    }
     private fun getRegimenListFromDataStore(dataStoreHelper: DataStoreHelper): ArrayList<Regimen> {
         val regimenList = ArrayList<Regimen>()
 

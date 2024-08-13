@@ -1,5 +1,6 @@
 package com.example.workoutapplication.dataClasses
 
+import android.util.Log
 import com.example.workoutapplication.dataClasses.ExerciseStats
 import com.example.workoutapplication.dataClasses.Regimen
 import java.time.LocalDate
@@ -20,18 +21,21 @@ class WorkoutLog (var date: LocalDate = LocalDate.now(), val workoutID: UUID = U
      * Clears existing ExerciseStats from this WorkoutLog and fills it with new
      * ExerciseStats based on the exercises in workoutRegimen
      *
-     * This method should only be called when workoutRegimen has been assigned,
-     * calling it otherwise will throw an IllegalStateException
+     * NOTE: If this method is called when workoutRegimen is null, it
+     * will clear the workout's existing exercise stats
      */
     fun replaceExerciseStatsForNewRegimen() {
-        if (workoutRegimen == null) {
-            throw IllegalStateException("Cannot fill WorkoutLog.exerciseStats with a null regimen!")
-        }
-
         exerciseStats.clear()
-        val exerciseList = workoutRegimen!!.exerciseList
-        for (exercise in exerciseList) {
-            exerciseStats.add(ExerciseStats(exercise, this))
+
+        if (workoutRegimen != null) {
+            val exerciseList = workoutRegimen!!.exerciseList
+            for (exercise in exerciseList) {
+                val newExerciseStat = ExerciseStats(exercise, this)
+                exerciseStats.add(newExerciseStat)
+                newExerciseStat.addEmptySet()
+                newExerciseStat.addEmptySet()
+            }
+            Log.d("Test", exerciseStats.toString())
         }
     }
 

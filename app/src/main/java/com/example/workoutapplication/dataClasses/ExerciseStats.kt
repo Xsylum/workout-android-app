@@ -17,7 +17,7 @@ class ExerciseStats (val exercise: Exercise,
     val metricDataGrid = ArrayList<ArrayList<ExerciseMetricValue>>()
 
 
-    private fun addEmptySet() {
+    fun addEmptySet() {
         val newExerciseSet = basicExerciseSet()
 
         metricDataGrid.add(newExerciseSet)

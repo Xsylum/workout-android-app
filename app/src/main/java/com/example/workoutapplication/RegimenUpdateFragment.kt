@@ -40,7 +40,7 @@ class RegimenUpdateFragment(private val name: String = "",
             val descView = layoutView.findViewById<EditText>(R.id.et_RegimenDescription)
             descView.setText(description)
 
-            builder.setTitle("Rename Dialog?")
+            builder.setTitle("Regimen Info Details")
                 .setPositiveButton("Confirm") {dialog, id ->
                     listener.onRegimenUpdatePositiveClick(nameView.text.toString(),
                         descView.text.toString())
