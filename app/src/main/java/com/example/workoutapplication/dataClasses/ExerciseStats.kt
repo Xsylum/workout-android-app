@@ -10,7 +10,9 @@ class ExerciseStats (val exercise: Exercise,
                      val partOfWorkout: WorkoutLog,
                      val eStatsID: UUID = UUID.randomUUID()) {
 
-    private val trackingMetrics = exercise.trackingMetrics
+    // NOTE: this value should stay updated with
+    // the ordering in metricDataGrid to maintain data accuracy!!
+    val trackingMetrics = exercise.trackingMetrics
 
     // metricDataGrid[position] gives the metric value for a single exercise set
     // metricDataGrid[position][x] gives the metricValue for the x-th metric of the exercise

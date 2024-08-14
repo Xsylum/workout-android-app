@@ -4,13 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.ExerciseStatAdapter.ExerciseStatViewHolder
+import com.example.workoutapplication.ExerciseSetRowTitleAdapter.ExerciseSetRowTitleViewHolder
 import com.example.workoutapplication.ExerciseSetAdapter.ExerciseSetViewHolder
 import com.example.workoutapplication.MetricValueAdapter.MetricValueViewHolder
+import com.example.workoutapplication.dataClasses.ExerciseMetric
 import com.example.workoutapplication.dataClasses.ExerciseMetricValue
 import com.example.workoutapplication.dataClasses.ExerciseStats
 
@@ -22,10 +23,12 @@ class ExerciseStatAdapter(private val localDataSet: ArrayList<ExerciseStats>)
 
     inner class ExerciseStatViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val exerciseNameTextView: TextView
+        val setRowTitleRecyclerView: RecyclerView
         val exerciseSetsRecyclerView: RecyclerView
 
         init {
             exerciseNameTextView = view.findViewById(R.id.tv_exerciseStatName)
+            setRowTitleRecyclerView = view.findViewById(R.id.rv_setRowTitles)
             exerciseSetsRecyclerView = view.findViewById(R.id.rv_exerciseSets)
         }
     }
@@ -38,6 +41,12 @@ class ExerciseStatAdapter(private val localDataSet: ArrayList<ExerciseStats>)
 
     override fun onBindViewHolder(viewHolder: ExerciseStatViewHolder, position: Int) {
         viewHolder.exerciseNameTextView.text = localDataSet[position].exercise.name
+
+        viewHolder.setRowTitleRecyclerView.layoutManager =
+            LinearLayoutManager(viewHolder.setRowTitleRecyclerView.context)
+        viewHolder.setRowTitleRecyclerView.adapter =
+            ExerciseSetRowTitleAdapter(localDataSet[position].trackingMetrics)
+
         viewHolder.exerciseSetsRecyclerView.layoutManager = LinearLayoutManager(
             viewHolder.exerciseSetsRecyclerView.context,
             LinearLayoutManager.HORIZONTAL,
@@ -52,6 +61,7 @@ class ExerciseStatAdapter(private val localDataSet: ArrayList<ExerciseStats>)
     }
 }
 
+//TODO combine ExerciseSetAdapter and ExerciseSetRowTitleAdapter using a grid layout manager [or maybe TableLayout?]
 /**
  * Adapter for handling the horizontal layout of an ExerciseStat's sets
  */
@@ -88,6 +98,38 @@ internal class ExerciseSetAdapter(private val localDataSet: ArrayList<ArrayList<
 }
 
 /**
+ * Adapter for displaying the name of the metrics being measured for the sets
+ * in ExerciseSetAdapter, i.e. providing a title to each set's row of metric values
+ */
+internal class ExerciseSetRowTitleAdapter(private val localDataSet: ArrayList<ExerciseMetric>) :
+    RecyclerView.Adapter<ExerciseSetRowTitleViewHolder>() {
+
+    inner class ExerciseSetRowTitleViewHolder(view: View) :RecyclerView.ViewHolder(view) {
+        val metricNameTextView: TextView
+
+        init {
+            metricNameTextView = view.findViewById(R.id.tv_exerciseSetRowTitle)
+        }
+    }
+
+    override fun onCreateViewHolder(viewHolder: ViewGroup, viewType: Int)
+        : ExerciseSetRowTitleViewHolder {
+        val view = LayoutInflater.from(viewHolder.context)
+            .inflate(R.layout.exercise_set_row_title_item, viewHolder, false)
+        return ExerciseSetRowTitleViewHolder(view)
+    }
+
+    override fun onBindViewHolder(viewHolder: ExerciseSetRowTitleViewHolder, pos: Int) {
+        viewHolder.metricNameTextView.text = localDataSet[pos].metricName
+    }
+
+    override fun getItemCount(): Int {
+        return localDataSet.size
+    }
+
+}
+
+/**
  * Adapter for handling the vertical layout of MetricValues
  * within each of ExerciseStat's sets
  */
@@ -96,9 +138,11 @@ internal class MetricValueAdapter(private val localDataSet: ArrayList<ExerciseMe
 
     inner class MetricValueViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val metricValueEditText: EditText
+        val measurementUnitTextView: TextView
 
         init {
             metricValueEditText = view.findViewById(R.id.et_metricValueInput)
+            measurementUnitTextView = view.findViewById(R.id.tv_metricMeasurementUnit)
         }
     }
 
@@ -110,8 +154,9 @@ internal class MetricValueAdapter(private val localDataSet: ArrayList<ExerciseMe
     }
 
     override fun onBindViewHolder(viewHolder: MetricValueViewHolder, position: Int) {
-        //TODO get metric's "Unit of measurement"
+        //TODO rework ExerciseMetric and ExerciseMetricValue to allow ExerciseMetricValue to partially access ExerciseMetric's properties
         viewHolder.metricValueEditText.setText(localDataSet[position].valStringFormat)
+        //viewHolder.measurementUnitTextView.text = localDataSet[position].
     }
 
     override fun getItemCount(): Int {

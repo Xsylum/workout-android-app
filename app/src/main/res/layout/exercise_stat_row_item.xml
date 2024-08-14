@@ -12,16 +12,30 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="5dp"
         android:text="ExerciseName"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_setRowTitles"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/rv_exerciseSets"
+        app:layout_constraintTop_toTopOf="@id/rv_exerciseSets" />
+
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_exerciseSets"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         android:descendantFocusability="afterDescendants"
         android:orientation="horizontal"
         android:scrollbars="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/rv_setRowTitles"
         app:layout_constraintTop_toBottomOf="@id/tv_exerciseStatName" />
 
     <View
