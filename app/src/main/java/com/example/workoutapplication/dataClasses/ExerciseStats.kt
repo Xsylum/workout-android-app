@@ -44,7 +44,7 @@ class ExerciseStats (val exercise: Exercise,
         val outputList = ArrayList<ExerciseMetricValue>()
 
         for (metric in trackingMetrics) {
-            val metricValue = ExerciseMetricValue(format = if (metric.isTimeStat) 1 else 0)
+            val metricValue = ExerciseMetricValue(metric)
             outputList.add(metricValue)
         }
 
@@ -61,6 +61,12 @@ class ExerciseStats (val exercise: Exercise,
             outputJson.put("UniqueID", eStatsID.toString())
             outputJson.put("Exercise", exercise.exerciseID)
             outputJson.put("Workout", partOfWorkout.workoutID)
+
+            val listOfMetricIDs = JSONArray()
+            for (metric in trackingMetrics) {
+                listOfMetricIDs.put(metric.metricID)
+            }
+            outputJson.put("TrackingMetrics", listOfMetricIDs)
 
             val exerciseSetsJson = JSONArray()
             for (exerciseSet in metricDataGrid) {
@@ -103,14 +109,25 @@ class ExerciseStats (val exercise: Exercise,
             val output = ExerciseStats(exercise, workout,
                 UUID.fromString(jsonObject.get("UniqueID").toString()))
 
+            // Fill out trackingMetrics
+            val metricIDs = JSONArray(jsonObject.get("TrackingMetrics").toString())
+            for (i in 0..< metricIDs.length()) {
+                val metricID = metricIDs.get(i).toString()
+                val metric = metricList.first {m ->
+                    m.metricID == UUID.fromString(metricID)
+                }
+
+                output.trackingMetrics.add(metric)
+            }
+
             // Fill out the ExerciseStats sets
             val exerciseSets = JSONArray(jsonObject.get("ExerciseSets").toString())
-            for (i in 0..exerciseSets.length()) {
+            for (i in 0..< exerciseSets.length()) {
                 val jsonArray = JSONArray(exerciseSets[i]) // get each set json
                 val newSet = ArrayList<ExerciseMetricValue>() // array of set's metricValues
 
                 // get metricValues from DataStore's list using ID, and add to the exercise set
-                for (i in 0..jsonArray.length()) {
+                for (i in 0..< jsonArray.length()) {
                     val metricValueID = jsonArray.get(i).toString()
                     val metricValue = valueList.first {v ->
                         v.metricValID == UUID.fromString(metricValueID)}

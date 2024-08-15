@@ -256,7 +256,7 @@ class ExerciseManagementActivity : AppCompatActivity(),
             .findViewById<CheckBox>(R.id.check_newMetricTime).isChecked
 
         // create the new metric
-        val outputMetric = ExerciseMetric(newMetricName, isTimeStat, newMetricUnit)
+        val outputMetric = ExerciseMetric(newMetricName, if (isTimeStat) 1 else 0, newMetricUnit)
 
         frag.addCreatedMetric(outputMetric)
         dataStoreCreateMetric(outputMetric)

@@ -155,8 +155,9 @@ internal class MetricValueAdapter(private val localDataSet: ArrayList<ExerciseMe
 
     override fun onBindViewHolder(viewHolder: MetricValueViewHolder, position: Int) {
         //TODO rework ExerciseMetric and ExerciseMetricValue to allow ExerciseMetricValue to partially access ExerciseMetric's properties
-        viewHolder.metricValueEditText.setText(localDataSet[position].valStringFormat)
-        //viewHolder.measurementUnitTextView.text = localDataSet[position].
+        viewHolder.metricValueEditText.setText(localDataSet[position].getStringValue())
+        viewHolder.measurementUnitTextView.text =
+            localDataSet[position].exerciseMetric.measurementUnit
     }
 
     override fun getItemCount(): Int {

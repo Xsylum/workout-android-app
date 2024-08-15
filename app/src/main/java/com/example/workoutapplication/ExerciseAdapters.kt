@@ -135,7 +135,7 @@ class ExerciseMetricManagementAdapter(private val localDataSet: ArrayList<Exerci
 }
 
 class ExerciseMetricAdditionAdapter(private val localDataSet: ArrayList<ExerciseMetric>,
-                                      private val listener: ExerciseMetricAddListener)
+                                    private val listener: ExerciseMetricAddListener)
     : RecyclerView.Adapter<ExerciseIncludeMetricViewHolder>() {
     interface ExerciseMetricAddListener {
         fun onMetricClick(position: Int)
@@ -175,6 +175,7 @@ class ExerciseMetricAdditionAdapter(private val localDataSet: ArrayList<Exercise
         // Get element from your dataset at this position and
         // replace the contents of the view with that element
         viewHolder.metricName.text = localDataSet[position].metricName
+        viewHolder.metricFormat.text = localDataSet[position].getFormatTypeAsString()
     }
 
     override fun getItemCount(): Int {

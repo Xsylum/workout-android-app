@@ -7,38 +7,27 @@ import java.util.UUID
 class ExerciseMetricValue {
 
     lateinit var metricValID: UUID
+    lateinit var exerciseMetric: ExerciseMetric
 
-    var metricFormat = -1;
     var metricFormatMaxRange = 1;
 
-    var valStringFormat = ""
-        private set
+    private var valStringFormat = ""
     private var valNumberFormat: Double? = null // metric Format 0
     private var valTimeFormat: TimeDuration? = null // metric Format 1
 
-    constructor(format: Int) {
-        if (0 > format || format > metricFormatMaxRange) {
-            throw IllegalArgumentException("desiredFormat must be between" +
-                    "0 and $metricFormatMaxRange (inclusive)")
-        }
-
-        metricFormat = format
+    constructor(exerciseMetric: ExerciseMetric) {
+        this.exerciseMetric = exerciseMetric
         metricValID = UUID.randomUUID()
     }
 
     /**
      * Constructor for usage with the fromJsonString() companion method
      */
-    constructor(metricValueID: UUID, metricFormat: Int, stringValue: String, formatValue:String) {
-        if (0 > metricFormat || metricFormat > metricFormatMaxRange) {
-            throw IllegalArgumentException("desiredFormat must be between" +
-                    "0 and $metricFormatMaxRange (inclusive)")
-        }
+    constructor(metricValueID: UUID, exerciseMetric: ExerciseMetric, stringValue: String, formatValue:String) {
 
         this.metricValID = metricValueID
-        this.metricFormat = metricFormat
         this.valStringFormat = stringValue
-        when (metricFormat) {
+        when (exerciseMetric.metricFormat) {
             0 -> valNumberFormat = formatValue.toDouble()
             1 -> valTimeFormat = TimeDuration.fromParsedString(formatValue)
         }
@@ -48,7 +37,7 @@ class ExerciseMetricValue {
         valStringFormat = stringValue
 
         // updating non-string value
-        when (metricFormat) {
+        when (exerciseMetric.metricFormat) {
             0 -> valNumberFormat = stringValue.toDouble()
             1 -> valTimeFormat = TimeDuration.fromParsedString(stringValue)
         }
@@ -60,18 +49,18 @@ class ExerciseMetricValue {
 
     /** Non-String Getters **/
     fun getDoubleValue(): Double {
-        if (metricFormat != 0) {
+        if (exerciseMetric.metricFormat != 0) {
             throw IllegalStateException("Cannot call getDoubleValue as metricFormat != 0" +
-                    "(metricFormat = $metricFormat")
+                    "(metricFormat = ${exerciseMetric.metricFormat}")
         }
 
         return valNumberFormat!!
     }
 
     fun getTimeValue(): TimeDuration {
-        if (metricFormat != 1) {
+        if (exerciseMetric.metricFormat != 1) {
             throw IllegalStateException("Cannot call getTimeValue as metricFormat != 0" +
-                    "(metricFormat = $metricFormat")
+                    "(metricFormat = ${exerciseMetric.metricFormat}")
         }
 
         return valTimeFormat!!
@@ -83,9 +72,9 @@ class ExerciseMetricValue {
 
         try {
             jsonObject.put("UniqueID", metricValID)
-            jsonObject.put("ValueFormat", metricFormat)
+            jsonObject.put("MetricID", exerciseMetric.metricID)
             jsonObject.put("StringValue", valStringFormat)
-            jsonObject.put("FormatValue", when (metricFormat) {
+            jsonObject.put("FormatValue", when (exerciseMetric.metricFormat) {
                                                     0 -> valNumberFormat.toString()
                                                     else -> valTimeFormat.toString()
                                                 })
@@ -98,16 +87,19 @@ class ExerciseMetricValue {
     }
 
     companion object {
-        fun fromJsonString(jsonString: String): ExerciseMetricValue {
+        fun fromJsonString(jsonString: String, exerciseMetrics: List<ExerciseMetric>)
+        : ExerciseMetricValue {
             try {
                 val jsonMetric = JSONObject(jsonString)
 
+                val exerciseMetricID = UUID.fromString(jsonMetric.get("MetricID").toString())
+                val parentMetric = exerciseMetrics.first {eM -> eM.metricID == exerciseMetricID}
+
                 val metricValueID = UUID.fromString(jsonMetric.get("UniqueID").toString())
-                val valueFormat = jsonMetric.get("ValueFormat").toString().toInt()
                 val stringValue = jsonMetric.get("StringValue").toString()
                 val formatValue = jsonMetric.get("formatValue").toString()
 
-                return ExerciseMetricValue(metricValueID, valueFormat, stringValue, formatValue)
+                return ExerciseMetricValue(metricValueID, parentMetric, stringValue, formatValue)
             } catch (e: JSONException) {
                 e.printStackTrace()
                 throw IllegalArgumentException("The input JSONString is invalid!")
