@@ -7,6 +7,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
 
+//TODO create a proxy class to make showing workouts on calendar dates easier
 class WorkoutLog (var date: LocalDate = LocalDate.now(), val workoutID: UUID = UUID.randomUUID()) {
     var timeOfCompletion: LocalTime? = null
         private set

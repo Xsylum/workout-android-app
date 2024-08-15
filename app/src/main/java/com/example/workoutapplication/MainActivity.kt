@@ -9,6 +9,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var exerciseManagementButton: Button
     private lateinit var regimenManagementButton: Button
     private lateinit var workoutLogManagementButton: Button
+    private lateinit var schedulingActivityButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +45,16 @@ class MainActivity : AppCompatActivity() {
                 Intent(
                     this,
                     WorkoutLogActivity::class.java
+                )
+            )
+        }
+
+        schedulingActivityButton = findViewById(R.id.btn_toSchedulingActivity)
+        schedulingActivityButton.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    SchedulingActivity::class.java
                 )
             )
         }
