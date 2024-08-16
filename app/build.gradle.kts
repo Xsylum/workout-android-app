@@ -52,4 +52,7 @@ dependencies {
 
     // Preferences DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // Material Calendar View
+    implementation("com.applandeo:material-calendar-view:1.9.2")
 }
