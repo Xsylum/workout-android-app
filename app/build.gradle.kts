@@ -52,4 +52,8 @@ dependencies {
 
     // Preferences DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // Calendar libraries
+    implementation("com.kizitonwose.calendar:view:2.5.4")
+
 }

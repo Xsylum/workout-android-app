@@ -20,14 +20,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <CalendarView
+    <com.kizitonwose.calendar.view.CalendarView
         android:id="@+id/workoutCalendar"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_schedulingTitle" />
+        app:layout_constraintTop_toBottomOf="@id/tv_schedulingTitle"
+        app:cv_dayViewResource = "@layout/calendar_day_layout"/>
 
     <Button
         android:id="@+id/btn_jumpToToday"
