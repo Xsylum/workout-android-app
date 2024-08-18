@@ -139,19 +139,19 @@ class ExerciseManagementActivity : AppCompatActivity(),
                     FragmentManager.POP_BACK_STACK_INCLUSIVE)
             }
 
-            exerciseUpdateFCV.visibility = View.GONE
-            addableMetricsFCV.visibility = View.GONE
+            exerciseUpdateFCV.makeGone()
+            addableMetricsFCV.makeGone()
         } else if (state == ActivityStates.UPDATE_FRAGMENT) {
             if (supportFragmentManager.findFragmentByTag("metricUpdate") != null) {
                 supportFragmentManager.popBackStack("closeMetricUpdate",
                     FragmentManager.POP_BACK_STACK_INCLUSIVE)
             }
 
-            exerciseUpdateFCV.visibility = View.VISIBLE
-            addableMetricsFCV.visibility = View.GONE
+            exerciseUpdateFCV.makeVisible()
+            addableMetricsFCV.makeGone()
         } else if (state == ActivityStates.METRIC_FRAGMENT) {
-            exerciseUpdateFCV.visibility = View.VISIBLE
-            addableMetricsFCV.visibility = View.VISIBLE
+            exerciseUpdateFCV.makeVisible()
+            addableMetricsFCV.makeVisible()
         }
         currentState = state
     }
