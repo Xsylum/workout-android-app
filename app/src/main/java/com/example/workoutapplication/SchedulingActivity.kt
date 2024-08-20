@@ -13,7 +13,11 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.workoutapplication.dataClasses.Regimen
 import com.example.workoutapplication.dataClasses.WorkoutEvent
 import com.example.workoutapplication.dataClasses.WorkoutLog
 import com.example.workoutapplication.databinding.CalendarDayLayoutBinding
@@ -28,10 +32,15 @@ class SchedulingActivity : AppCompatActivity() {
 
     lateinit var calendarView: com.kizitonwose.calendar.view.CalendarView
     val events = mutableMapOf<LocalDate, List<WorkoutEvent>>()
+    var selectedDay: LocalDate = LocalDate.now()
+
+    lateinit var scheduleRecyclerView: RecyclerView
+
 
     fun DEBUG_CreateEvents() {
         val testDate = LocalDate.of(2024, 8, 12)
         val testWorkoutLog = WorkoutLog(testDate)
+        testWorkoutLog.workoutRegimen = Regimen("TestReg", "Test")
         val testEvent = WorkoutEvent(testWorkoutLog, testDate, WorkoutEvent.EventDotColour.GREEN)
         val eventList = mutableListOf(testEvent)
 
@@ -57,6 +66,14 @@ class SchedulingActivity : AppCompatActivity() {
         class DayViewContainer(view: View) : ViewContainer(view) {
             lateinit var day: CalendarDay // set when container is bound
             val binding = CalendarDayLayoutBinding.bind(view)
+
+            init {
+                view.setOnClickListener {
+                    selectedDay = day.date
+                    Log.d("DaySelection", "$selectedDay")
+                    displayWorkoutScheduleForDay(selectedDay)
+                }
+            }
         }
 
         // providing binder for calendar
@@ -107,5 +124,13 @@ class SchedulingActivity : AppCompatActivity() {
         calendarView.setup(startMonth, endMonth, firstDayOfWeek)
         calendarView.scrollToMonth(currentMonth)
 
+        scheduleRecyclerView = findViewById(R.id.rv_iteneraryWorkouts)
+        scheduleRecyclerView.layoutManager = LinearLayoutManager(this)
+        displayWorkoutScheduleForDay(selectedDay)
+    }
+
+    fun displayWorkoutScheduleForDay(date: LocalDate) {
+        val newScheduleAdapter = WorkoutScheduleAdapter(events[date] ?: ArrayList())
+        scheduleRecyclerView.swapAdapter(newScheduleAdapter, true)
     }
 }
