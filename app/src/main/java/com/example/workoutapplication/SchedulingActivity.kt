@@ -1,5 +1,6 @@
 package com.example.workoutapplication
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -21,6 +22,7 @@ import com.example.workoutapplication.dataClasses.Regimen
 import com.example.workoutapplication.dataClasses.WorkoutEvent
 import com.example.workoutapplication.dataClasses.WorkoutLog
 import com.example.workoutapplication.databinding.CalendarDayLayoutBinding
+import com.example.workoutapplication.WorkoutScheduleAdapter.WorkoutScheduleListener
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.kizitonwose.calendar.view.MonthDayBinder
@@ -28,7 +30,7 @@ import com.kizitonwose.calendar.view.ViewContainer
 import java.time.LocalDate
 import java.time.YearMonth
 
-class SchedulingActivity : AppCompatActivity() {
+class SchedulingActivity : AppCompatActivity(), WorkoutScheduleListener {
 
     lateinit var calendarView: com.kizitonwose.calendar.view.CalendarView
     val events = mutableMapOf<LocalDate, List<WorkoutEvent>>()
@@ -130,7 +132,20 @@ class SchedulingActivity : AppCompatActivity() {
     }
 
     fun displayWorkoutScheduleForDay(date: LocalDate) {
-        val newScheduleAdapter = WorkoutScheduleAdapter(events[date] ?: ArrayList())
+        val dateTV = findViewById<TextView>(R.id.tv_iteneraryDate)
+        dateTV.text = date.toString()
+
+        val newScheduleAdapter =
+            WorkoutScheduleAdapter(events[date] ?: ArrayList(), this)
         scheduleRecyclerView.swapAdapter(newScheduleAdapter, true)
+    }
+
+    override fun addNewWorkout() {
+        startActivity(
+            Intent(
+                this,
+                WorkoutLogActivity::class.java
+            )
+        )
     }
 }

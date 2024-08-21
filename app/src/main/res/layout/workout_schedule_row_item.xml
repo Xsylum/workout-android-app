@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/tv_WorkoutScheduleName"
+        android:id="@+id/tv_workoutScheduleName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxWidth="150dp"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_WorkoutScheduleExecises"
+        android:id="@+id/tv_workoutScheduleExecises"
         android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -26,12 +26,12 @@
         android:text="List, Of, Exercises"
         android:textSize="16sp"
         app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toStartOf="@+id/tv_WorkoutScheduleRegimen"
-        app:layout_constraintStart_toEndOf="@+id/tv_WorkoutScheduleName"
+        app:layout_constraintEnd_toStartOf="@+id/tv_workoutScheduleRegimen"
+        app:layout_constraintStart_toEndOf="@+id/tv_workoutScheduleName"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_WorkoutScheduleRegimen"
+        android:id="@+id/tv_workoutScheduleRegimen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxWidth="100dp"
