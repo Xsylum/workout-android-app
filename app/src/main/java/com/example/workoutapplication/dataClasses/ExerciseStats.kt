@@ -1,13 +1,12 @@
 package com.example.workoutapplication.dataClasses
 
-import androidx.core.util.toAndroidXPair
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.UUID
 
 class ExerciseStats (val exercise: Exercise,
-                     val partOfWorkout: WorkoutLog,
+                     val partOfWorkout: UUID, // workout ID
                      val eStatsID: UUID = UUID.randomUUID()) {
 
     // NOTE: this value should stay updated with
@@ -16,7 +15,7 @@ class ExerciseStats (val exercise: Exercise,
 
     // metricDataGrid[position] gives the metric value for a single exercise set
     // metricDataGrid[position][x] gives the metricValue for the x-th metric of the exercise
-    val metricDataGrid = ArrayList<ArrayList<ExerciseMetricValue>>()
+    val metricDataGrid = ArrayList<ArrayList<ExerciseStatValue>>()
 
 
     fun addEmptySet() {
@@ -25,7 +24,7 @@ class ExerciseStats (val exercise: Exercise,
         metricDataGrid.add(newExerciseSet)
     }
 
-    private fun addSet(set: ArrayList<ExerciseMetricValue>) {
+    private fun addSet(set: ArrayList<ExerciseStatValue>) {
         metricDataGrid.add(set)
     }
 
@@ -40,11 +39,11 @@ class ExerciseStats (val exercise: Exercise,
      * Each of the exercise metrics is paired with an empty String value,
      * allowing the values to be set by the user later on.
      */
-    private fun basicExerciseSet(): ArrayList<ExerciseMetricValue> {
-        val outputList = ArrayList<ExerciseMetricValue>()
+    private fun basicExerciseSet(): ArrayList<ExerciseStatValue> {
+        val outputList = ArrayList<ExerciseStatValue>()
 
         for (metric in trackingMetrics) {
-            val metricValue = ExerciseMetricValue(metric)
+            val metricValue = ExerciseStatValue(metric)
             outputList.add(metricValue)
         }
 
@@ -60,13 +59,7 @@ class ExerciseStats (val exercise: Exercise,
 
             outputJson.put("UniqueID", eStatsID.toString())
             outputJson.put("Exercise", exercise.exerciseID)
-            outputJson.put("Workout", partOfWorkout.workoutID)
-
-            val listOfMetricIDs = JSONArray()
-            for (metric in trackingMetrics) {
-                listOfMetricIDs.put(metric.metricID)
-            }
-            outputJson.put("TrackingMetrics", listOfMetricIDs)
+            outputJson.put("Workout", partOfWorkout.toString())
 
             val exerciseSetsJson = JSONArray()
             for (exerciseSet in metricDataGrid) {
@@ -94,37 +87,23 @@ class ExerciseStats (val exercise: Exercise,
          */
         fun fromJsonString(jsonString: String,
                            exerciseList: List<Exercise>,
-                           workoutList: List<WorkoutLog>,
-                           metricList: List<ExerciseMetric>,
-                           valueList: List<ExerciseMetricValue>): ExerciseStats {
+                           valueList: List<ExerciseStatValue>): ExerciseStats {
             val jsonObject = JSONObject(jsonString)
 
             // Retrieve related exercise and workout from relevant lists
             val exerciseID = jsonObject.get("Exercise").toString()
             val exercise = exerciseList.first {e -> e.exerciseID == UUID.fromString(exerciseID)}
-            val workoutID = jsonObject.get("Workout").toString()
-            val workout = workoutList.first {w -> w.workoutID == UUID.fromString(workoutID)}
+            val workoutID = UUID.fromString(jsonObject.get("Workout").toString())
 
             // Create the output ExerciseStats
-            val output = ExerciseStats(exercise, workout,
+            val output = ExerciseStats(exercise, workoutID,
                 UUID.fromString(jsonObject.get("UniqueID").toString()))
-
-            // Fill out trackingMetrics
-            val metricIDs = JSONArray(jsonObject.get("TrackingMetrics").toString())
-            for (i in 0..< metricIDs.length()) {
-                val metricID = metricIDs.get(i).toString()
-                val metric = metricList.first {m ->
-                    m.metricID == UUID.fromString(metricID)
-                }
-
-                output.trackingMetrics.add(metric)
-            }
 
             // Fill out the ExerciseStats sets
             val exerciseSets = JSONArray(jsonObject.get("ExerciseSets").toString())
             for (i in 0..< exerciseSets.length()) {
                 val jsonArray = JSONArray(exerciseSets[i]) // get each set json
-                val newSet = ArrayList<ExerciseMetricValue>() // array of set's metricValues
+                val newSet = ArrayList<ExerciseStatValue>() // array of set's metricValues
 
                 // get metricValues from DataStore's list using ID, and add to the exercise set
                 for (i in 0..< jsonArray.length()) {

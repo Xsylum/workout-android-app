@@ -12,7 +12,7 @@ import com.example.workoutapplication.ExerciseSetRowTitleAdapter.ExerciseSetRowT
 import com.example.workoutapplication.ExerciseSetAdapter.ExerciseSetViewHolder
 import com.example.workoutapplication.MetricValueAdapter.MetricValueViewHolder
 import com.example.workoutapplication.dataClasses.ExerciseMetric
-import com.example.workoutapplication.dataClasses.ExerciseMetricValue
+import com.example.workoutapplication.dataClasses.ExerciseStatValue
 import com.example.workoutapplication.dataClasses.ExerciseStats
 
 /**
@@ -65,7 +65,7 @@ class ExerciseStatAdapter(private val localDataSet: ArrayList<ExerciseStats>)
 /**
  * Adapter for handling the horizontal layout of an ExerciseStat's sets
  */
-internal class ExerciseSetAdapter(private val localDataSet: ArrayList<ArrayList<ExerciseMetricValue>>) :
+internal class ExerciseSetAdapter(private val localDataSet: ArrayList<ArrayList<ExerciseStatValue>>) :
     RecyclerView.Adapter<ExerciseSetViewHolder>() {
 
     inner class ExerciseSetViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -133,7 +133,7 @@ internal class ExerciseSetRowTitleAdapter(private val localDataSet: ArrayList<Ex
  * Adapter for handling the vertical layout of MetricValues
  * within each of ExerciseStat's sets
  */
-internal class MetricValueAdapter(private val localDataSet: ArrayList<ExerciseMetricValue>)
+internal class MetricValueAdapter(private val localDataSet: ArrayList<ExerciseStatValue>)
     : RecyclerView.Adapter<MetricValueViewHolder>() {
 
     inner class MetricValueViewHolder(view: View): RecyclerView.ViewHolder(view) {

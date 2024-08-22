@@ -4,7 +4,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.UUID
 
-class ExerciseMetricValue {
+class ExerciseStatValue {
 
     lateinit var metricValID: UUID
     lateinit var exerciseMetric: ExerciseMetric
@@ -71,8 +71,8 @@ class ExerciseMetricValue {
         val jsonObject = JSONObject()
 
         try {
-            jsonObject.put("UniqueID", metricValID)
-            jsonObject.put("MetricID", exerciseMetric.metricID)
+            jsonObject.put("UniqueID", metricValID.toString())
+            jsonObject.put("MetricID", exerciseMetric.metricID.toString())
             jsonObject.put("StringValue", valStringFormat)
             jsonObject.put("FormatValue", when (exerciseMetric.metricFormat) {
                                                     0 -> valNumberFormat.toString()
@@ -88,7 +88,7 @@ class ExerciseMetricValue {
 
     companion object {
         fun fromJsonString(jsonString: String, exerciseMetrics: List<ExerciseMetric>)
-        : ExerciseMetricValue {
+        : ExerciseStatValue {
             try {
                 val jsonMetric = JSONObject(jsonString)
 
@@ -99,7 +99,7 @@ class ExerciseMetricValue {
                 val stringValue = jsonMetric.get("StringValue").toString()
                 val formatValue = jsonMetric.get("formatValue").toString()
 
-                return ExerciseMetricValue(metricValueID, parentMetric, stringValue, formatValue)
+                return ExerciseStatValue(metricValueID, parentMetric, stringValue, formatValue)
             } catch (e: JSONException) {
                 e.printStackTrace()
                 throw IllegalArgumentException("The input JSONString is invalid!")
