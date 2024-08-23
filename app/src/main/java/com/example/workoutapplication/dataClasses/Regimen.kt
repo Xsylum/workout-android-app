@@ -12,7 +12,7 @@ import java.util.UUID
  */
 class Regimen {
 
-    private lateinit var regimenID: UUID
+    lateinit var regimenID: UUID
     var name: String? = null
     var description: String? = null
     var exerciseList = ArrayList<Exercise>() //TODO("hold exerciseIDs, call for exercises when needed")

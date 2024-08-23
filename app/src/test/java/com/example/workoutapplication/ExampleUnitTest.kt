@@ -1,6 +1,6 @@
 package com.example.workoutapplication
 
-import com.example.workoutapplication.dataClasses.ExerciseMetricValue
+import com.example.workoutapplication.dataClasses.ExerciseStatValue
 import org.junit.Assert
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertAll
@@ -24,11 +24,11 @@ class ExampleUnitTest {
 
     @Test
     fun exerciseMetricValueFormat_tooLow() {
-        Assert.assertThrows(IllegalArgumentException::class.java) { ExerciseMetricValue(-4) }
+        Assert.assertThrows(IllegalArgumentException::class.java) { ExerciseStatValue(-4) }
     }
 
     @Test
     fun exerciseMetricValueFormat_isCorrect() {
-        assertAll( { ExerciseMetricValue(0) } )
+        assertAll( { ExerciseStatValue(0) } )
     }
 }

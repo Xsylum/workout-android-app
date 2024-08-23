@@ -41,7 +41,7 @@ class SchedulingActivity : AppCompatActivity(), WorkoutScheduleListener {
 
     fun DEBUG_CreateEvents() {
         val testDate = LocalDate.of(2024, 8, 12)
-        val testWorkoutLog = WorkoutLog(testDate)
+        val testWorkoutLog = WorkoutLog()
         testWorkoutLog.workoutRegimen = Regimen("TestReg", "Test")
         val testEvent = WorkoutEvent(testWorkoutLog, testDate, WorkoutEvent.EventDotColour.GREEN)
         val eventList = mutableListOf(testEvent)

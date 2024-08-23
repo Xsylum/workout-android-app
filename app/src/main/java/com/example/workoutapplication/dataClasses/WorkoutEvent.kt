@@ -82,7 +82,7 @@ class WorkoutEvent {
     }
 }
 
-class WorkoutEventDataStore() {
+class WorkoutEventDataStore private constructor() {
 
     var eventIDString = ""
     var workoutIDString = ""
