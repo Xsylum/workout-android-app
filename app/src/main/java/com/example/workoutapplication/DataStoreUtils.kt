@@ -7,6 +7,8 @@ import com.example.workoutapplication.dataClasses.ExerciseStatValue
 import com.example.workoutapplication.dataClasses.ExerciseStats
 import com.example.workoutapplication.dataClasses.Regimen
 import com.example.workoutapplication.dataClasses.RegimenDataStore
+import com.example.workoutapplication.dataClasses.WorkoutEvent
+import com.example.workoutapplication.dataClasses.WorkoutEventDataStore
 import com.example.workoutapplication.dataClasses.WorkoutLog
 import com.example.workoutapplication.dataClasses.WorkoutLogDataStore
 import org.json.JSONArray
@@ -19,7 +21,8 @@ enum class DataStoreKey {
     EXERCISE("ExerciseList"),
     REGIMEN("RegimenList"),
     EXERCISE_STAT("ExerciseStatsList"),
-    WORKOUT("WorkoutLogList");
+    WORKOUT("WorkoutLogList"),
+    WORKOUT_EVENT("WorkoutEventList");
 
     val key: String
     constructor(key: String) {
@@ -126,9 +129,50 @@ fun getDataStoreObjectList(dsKey: DataStoreKey, dataStoreHelper: DataStoreHelper
                 outputArray.add(workoutLog)
             }
         }
+
+        DataStoreKey.WORKOUT_EVENT -> {
+            val workouts = getDataStoreObjectList(DataStoreKey.WORKOUT, dataStoreHelper)
+                    as ArrayList<WorkoutLog>
+
+            for (i in 0..<jsonObjectArray.length()) {
+                val workoutEventDS = WorkoutEventDataStore.fromJsonString(
+                    jsonObjectArray.get(i).toString()
+                )
+                val workoutEvent = WorkoutEvent(workoutEventDS, workouts)
+                outputArray.add(workoutEvent)
+            }
+        }
     }
 
     return outputArray
 }
 
-//TODO create setDataStoreKeyValue helper method
+/**
+ * newObject should be the object being added to the DataStore list (i.e. NOT a jsonString, etc.)
+ */
+fun setDataStoreAtListPosition(dsKey: DataStoreKey, position: Int,
+                               newObject: Any, dataStoreHelper: DataStoreHelper) {
+    val targetList: String? = dataStoreHelper.getStringValue(dsKey.key)
+    val targetJsonArray = if (targetList != null) {
+        JSONArray(targetList)
+    } else JSONArray()
+
+    // interpreting newObject as relevant type to get its jsonString representation
+    val newObjectJsonString: String = when(dsKey) {
+        DataStoreKey.EXERCISE_METRIC -> (newObject as ExerciseMetric).toJsonString()
+        DataStoreKey.EXERCISE_STAT_VALUE -> (newObject as ExerciseStatValue).toJsonString()
+        DataStoreKey.EXERCISE -> (newObject as Exercise).toJsonString()
+        DataStoreKey.REGIMEN -> (newObject as Regimen).toJsonString()
+        DataStoreKey.EXERCISE_STAT -> (newObject as ExerciseStats).toJsonString()
+        DataStoreKey.WORKOUT -> (newObject as WorkoutLog).toJsonString()
+        DataStoreKey.WORKOUT_EVENT -> (newObject as WorkoutEvent).toJsonString()
+    }
+
+    if (position == -1) { // new object
+        targetJsonArray.put(newObjectJsonString)
+    } else { // editing existing object
+        targetJsonArray.put(position, newObjectJsonString)
+    }
+
+    dataStoreHelper.setStringValue(dsKey.key, targetJsonArray.toString())
+}
