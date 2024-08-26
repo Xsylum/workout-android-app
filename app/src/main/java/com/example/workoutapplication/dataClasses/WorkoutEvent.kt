@@ -7,7 +7,15 @@ import java.util.UUID
 
 class WorkoutEvent {
 
-    enum class EventDotColour {BLACK, RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE}
+    enum class EventDotColour(val hexColour: String) {
+        BLACK("#000000"),
+        RED("#FF0000"),
+        ORANGE("#FF9D00"),
+        YELLOW("#FFFF00"),
+        GREEN("#00FF00"),
+        BLUE("#0000FF"),
+        PURPLE("#AA00FF");
+    }
 
     var eventID: UUID
     var workoutLog: WorkoutLog
@@ -17,7 +25,8 @@ class WorkoutEvent {
     var altDisplayDesc: String = ""
 
     // Creating a WorkoutEvent from scratch
-    constructor(workout: WorkoutLog, date: LocalDate, dotColour: EventDotColour,
+    constructor(workout: WorkoutLog, date: LocalDate,
+                dotColour: EventDotColour = EventDotColour.BLUE,
                 eventID: UUID = UUID.randomUUID(), altDisplayName: String = "",
                 altDisplayDesc: String = "") {
         this.eventID = eventID

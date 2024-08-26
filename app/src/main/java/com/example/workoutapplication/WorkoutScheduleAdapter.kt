@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.WorkoutScheduleAdapter.WorkoutScheduleViewHolder
 import com.example.workoutapplication.dataClasses.WorkoutEvent
+import java.lang.Integer.min
 
 open class RecyclerViewItem
 
@@ -85,13 +86,15 @@ class WorkoutScheduleAdapter(private val localDataSet: List<WorkoutEvent>,
                 // Building preview string of workout's exercises
                 val exerciseList = StringBuilder()
                 val workoutExerciseList = localDataSet[pos].workoutLog.workoutRegimen!!.exerciseList
-                if (workoutExerciseList.size != 0) {
-                    for (exercise in workoutExerciseList.subList(0, 5)) {
+                if (workoutExerciseList.size > 0) {
+                    val shownExerciseCount = min(workoutExerciseList.size, 5)
+
+                    for (exercise in workoutExerciseList.subList(0, shownExerciseCount - 1)) {
                         exerciseList.append(exercise.name)
                         exerciseList.append(", ")
                     }
 
-                    exerciseList.append(workoutExerciseList[5])
+                    exerciseList.append(workoutExerciseList[shownExerciseCount - 1])
 
                     if (workoutExerciseList.size > 5) {
                         exerciseList.append("...")

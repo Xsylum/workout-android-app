@@ -13,6 +13,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import androidx.core.view.isVisible
@@ -27,16 +29,19 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.ViewContainer
+import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.YearMonth
 
 class SchedulingActivity : AppCompatActivity(), WorkoutScheduleListener {
 
     lateinit var calendarView: com.kizitonwose.calendar.view.CalendarView
-    val events = mutableMapOf<LocalDate, List<WorkoutEvent>>()
+    val events = mutableMapOf<LocalDate, MutableList<WorkoutEvent>>() /** First time using kotlin collections */
     var selectedDay: LocalDate = LocalDate.now()
 
     lateinit var scheduleRecyclerView: RecyclerView
+
+    private lateinit var activityResultLaunch: ActivityResultLauncher<Intent>
 
 
     fun DEBUG_CreateEvents() {
@@ -55,6 +60,33 @@ class SchedulingActivity : AppCompatActivity(), WorkoutScheduleListener {
 
         //TODO remove this testing method
         DEBUG_CreateEvents()
+
+        activityResultLaunch = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {result ->
+            when (result.resultCode) {
+                // New WorkoutLog created
+                0 -> {
+                    // get the new workout
+                    val newWorkoutPos = result.data?.getIntExtra(
+                        "WORKOUT_POSITION", -1)
+                    val workoutList = (getDataStoreObjectList(DataStoreKey.WORKOUT,
+                        getDataStoreHelper(this)) as ArrayList<WorkoutLog>)
+                    val workout = workoutList[newWorkoutPos!!]
+                    val newEvent = WorkoutEvent(workout, selectedDay)
+
+                    // add workout to selected day schedule
+                    if (events[selectedDay] != null) {
+                        events[selectedDay]!!.add(newEvent)
+                    } else { // also need to initialize the schedule list
+                        events[selectedDay] = mutableListOf(newEvent)
+                    }
+
+                    // update display list
+                    displayWorkoutScheduleForDay(selectedDay)
+                }
+            }
+        }
 
         calendarView = findViewById(R.id.workoutCalendar)
 
@@ -102,13 +134,9 @@ class SchedulingActivity : AppCompatActivity(), WorkoutScheduleListener {
                         if (events[data.date].orEmpty().isNotEmpty()) {
                             eventDotView.makeVisible()
                             val workoutLog = events[data.date]!!.first()
-                            val eventDotColour = when (workoutLog.dotColour) {
-                                WorkoutEvent.EventDotColour.GREEN ->
-                                    Color.parseColor("#00FF00")
-                                else -> Color.parseColor("FF0000")
-                            }
 
-                            eventDotView.background.changeColor(eventDotColour)
+                            eventDotView.background.changeColor(Color.parseColor(
+                                workoutLog.dotColour.hexColour))
                         } else {
                             eventDotView.makeInvisible()
                         }
@@ -138,14 +166,15 @@ class SchedulingActivity : AppCompatActivity(), WorkoutScheduleListener {
         val newScheduleAdapter =
             WorkoutScheduleAdapter(events[date] ?: ArrayList(), this)
         scheduleRecyclerView.swapAdapter(newScheduleAdapter, true)
+
+        // update the event dot for this date
+        calendarView.notifyDateChanged(date)
     }
 
     override fun addNewWorkout() {
-        startActivity(
-            Intent(
-                this,
-                WorkoutLogActivity::class.java
-            )
-        )
+        val intent = Intent(this, WorkoutLogActivity::class.java)
+        intent.putExtra("WorkoutDSPosition", -1)
+
+        activityResultLaunch.launch(intent)
     }
 }

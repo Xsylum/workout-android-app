@@ -29,11 +29,17 @@ class WorkoutLog {
         } else {
             LocalTime.parse(workoutDataStore.timeOfCompletion)
         }
-        workoutRegimen = regimenList.first {r ->
-            r.regimenID == UUID.fromString(workoutDataStore.regimenID)}
-        for (eStatIDString in workoutDataStore.exerciseStatIDs) {
-            exerciseStats.add(eStatList.first {eS ->
-                eS.eStatsID == UUID.fromString(eStatIDString)})
+        if (workoutDataStore.regimenID == "null") {
+            workoutRegimen = null
+
+        } else {
+            workoutRegimen = regimenList.first {r ->
+                r.regimenID == UUID.fromString(workoutDataStore.regimenID)}
+            for (eStatIDString in workoutDataStore.exerciseStatIDs) {
+                val targetExerciseStat = eStatList.firstOrNull {eS ->
+                    eS.eStatsID == UUID.fromString(eStatIDString)}
+                if (targetExerciseStat != null) exerciseStats.add(targetExerciseStat)
+            }
         }
     }
 
@@ -60,15 +66,11 @@ class WorkoutLog {
     }
 
     fun toJsonString(): String {
-        if (workoutRegimen == null) {
-            throw IllegalStateException("Don't convert workout without first setting regimen!")
-        }
-
         val output = JSONObject()
 
         try {
             output.put("UniqueID", workoutID)
-            output.put("RegimenID", workoutRegimen!!.regimenID)
+            output.put("RegimenID", workoutRegimen?.regimenID ?: "null")
             output.put("TimeOfCompletion", timeOfCompletion.toString())
 
             val exerciseStatIDs = JSONArray()

@@ -15,7 +15,7 @@ import org.json.JSONArray
 
 
 
-enum class DataStoreKey {
+enum class DataStoreKey(val key: String) {
     EXERCISE_METRIC("ExerciseMetricList"),
     EXERCISE_STAT_VALUE("ExerciseStatValuesList"),
     EXERCISE("ExerciseList"),
@@ -23,11 +23,6 @@ enum class DataStoreKey {
     EXERCISE_STAT("ExerciseStatsList"),
     WORKOUT("WorkoutLogList"),
     WORKOUT_EVENT("WorkoutEventList");
-
-    val key: String
-    constructor(key: String) {
-        this.key = key
-    }
 }
 
 /**
@@ -149,9 +144,11 @@ fun getDataStoreObjectList(dsKey: DataStoreKey, dataStoreHelper: DataStoreHelper
 
 /**
  * newObject should be the object being added to the DataStore list (i.e. NOT a jsonString, etc.)
+ *
+ * Returns the DataStore list position that the data was successfully stored at
  */
 fun setDataStoreAtListPosition(dsKey: DataStoreKey, position: Int,
-                               newObject: Any, dataStoreHelper: DataStoreHelper) {
+                               newObject: Any, dataStoreHelper: DataStoreHelper): Int {
     val targetList: String? = dataStoreHelper.getStringValue(dsKey.key)
     val targetJsonArray = if (targetList != null) {
         JSONArray(targetList)
@@ -168,11 +165,14 @@ fun setDataStoreAtListPosition(dsKey: DataStoreKey, position: Int,
         DataStoreKey.WORKOUT_EVENT -> (newObject as WorkoutEvent).toJsonString()
     }
 
-    if (position == -1) { // new object
+    if (position == -1 || position >= targetJsonArray.length()) { // new object
         targetJsonArray.put(newObjectJsonString)
     } else { // editing existing object
         targetJsonArray.put(position, newObjectJsonString)
     }
 
     dataStoreHelper.setStringValue(dsKey.key, targetJsonArray.toString())
+    //TODO need to build testcases to ensure covers correct range
+    return if (position == -1 || position >= targetJsonArray.length() - 1)
+            (targetJsonArray.length() - 1) else position
 }

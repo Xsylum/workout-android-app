@@ -1,5 +1,6 @@
 package com.example.workoutapplication
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,7 @@ import android.widget.Spinner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.workoutapplication.dataClasses.Regimen
+import com.example.workoutapplication.dataClasses.WorkoutEvent
 import com.example.workoutapplication.dataClasses.WorkoutLog
 
 class WorkoutLogActivity : AppCompatActivity() {
@@ -33,17 +35,17 @@ class WorkoutLogActivity : AppCompatActivity() {
                 as ArrayList<Regimen>
         setupRegimenSpinner(regimenList)
 
-        // Setup activity views for the current intent (new WorkoutLog vs Editing WorkoutLog
+        // Setup activity views for the current intent (new WorkoutLog vs Editing WorkoutLog)
         workoutDataStorePosition = intent.getIntExtra("WorkoutDSPosition", -1)
-        if (workoutDataStorePosition != -1) {
+        workout = if (workoutDataStorePosition != -1) {
             // User is editing an existing WorkoutLog (get WorkoutList over building
             // specific workout object, which requires ExerciseStatLists)
             val workoutList = getDataStoreObjectList(DataStoreKey.WORKOUT, dataStoreHelper)
                     as ArrayList<WorkoutLog>
-            workout = workoutList[workoutDataStorePosition]
+            workoutList[workoutDataStorePosition]
         } else {
             // User is designing a new WorkoutLog
-            workout = WorkoutLog()
+            WorkoutLog()
         }
 
         // ExerciseStat List setup
@@ -70,14 +72,26 @@ class WorkoutLogActivity : AppCompatActivity() {
                 workout.replaceExerciseStatsForNewRegimen()
                 exerciseStatsRV.adapter!!.notifyDataSetChanged()
 
-                for (exerciseStat in workout.exerciseStats) {
-                    Log.d("Testing", exerciseStat.metricDataGrid.toString())
-                }
+                saveWorkoutToDataStore()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
         }
+    }
+
+    private fun saveWorkoutToDataStore() {
+        workoutDataStorePosition = setDataStoreAtListPosition(DataStoreKey.WORKOUT,
+            workoutDataStorePosition, workout, dataStoreHelper)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+
+        val intent = Intent()
+        intent.putExtra("WORKOUT_POSITION", workoutDataStorePosition)
+        setResult(0, intent)
+        finish()
     }
 }
