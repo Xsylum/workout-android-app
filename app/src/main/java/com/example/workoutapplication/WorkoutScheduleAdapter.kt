@@ -77,7 +77,7 @@ class WorkoutScheduleAdapter(private val localDataSet: List<WorkoutEvent>,
         if (getItemViewType(pos) == TYPE_EXISTING) {
             val holder = viewHolder as WorkoutScheduleViewHolder
             holder.workoutNameTV.text =
-                localDataSet[pos].workoutLog.workoutID.toString()
+                localDataSet[pos].altDisplayName
 
             val workoutRegimen = localDataSet[pos].workoutLog.workoutRegimen
             if (workoutRegimen != null) {

@@ -1,5 +1,6 @@
 package com.example.workoutapplication.dataClasses
 
+import android.util.Log
 import org.json.JSONException
 import org.json.JSONObject
 import java.time.LocalDate
@@ -33,7 +34,13 @@ class WorkoutEvent {
         this.workoutLog = workout
         this.date = date
         this.dotColour = dotColour
-        this.altDisplayName = altDisplayName
+        this.altDisplayName = if (workout.workoutRegimen != null && altDisplayName == "") {
+            Log.d("Test", "Test1")
+            workout.workoutRegimen!!.name!! + " Event"
+        } else {
+            Log.d("Test", "Test2")
+            altDisplayName
+        }
         this.altDisplayDesc = altDisplayDesc
     }
 
