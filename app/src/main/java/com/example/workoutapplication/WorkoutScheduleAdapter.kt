@@ -94,7 +94,7 @@ class WorkoutScheduleAdapter(private val localDataSet: List<WorkoutEvent>,
                         exerciseList.append(", ")
                     }
 
-                    exerciseList.append(workoutExerciseList[shownExerciseCount - 1])
+                    exerciseList.append(workoutExerciseList[shownExerciseCount - 1].name)
 
                     if (workoutExerciseList.size > 5) {
                         exerciseList.append("...")

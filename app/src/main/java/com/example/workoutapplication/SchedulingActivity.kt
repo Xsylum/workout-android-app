@@ -43,23 +43,21 @@ class SchedulingActivity : AppCompatActivity(), WorkoutScheduleListener {
 
     private lateinit var activityResultLaunch: ActivityResultLauncher<Intent>
 
-
-    fun DEBUG_CreateEvents() {
-        val testDate = LocalDate.of(2024, 8, 12)
-        val testWorkoutLog = WorkoutLog()
-        testWorkoutLog.workoutRegimen = Regimen("TestReg", "Test")
-        val testEvent = WorkoutEvent(testWorkoutLog, testDate, WorkoutEvent.EventDotColour.GREEN)
-        val eventList = mutableListOf(testEvent)
-
-        events[testDate] = eventList
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scheduling)
 
-        //TODO remove this testing method
-        DEBUG_CreateEvents()
+        val existingEvents = getDataStoreObjectList(DataStoreKey.WORKOUT_EVENT,
+            getDataStoreHelper(this)) as ArrayList<WorkoutEvent>
+        for (event in existingEvents) {
+            if (events[event.date] != null) {
+                events[event.date]!!.add(event)
+            } else {
+                events[event.date] = mutableListOf(event)
+            }
+        }
+
+
 
         activityResultLaunch = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -81,6 +79,10 @@ class SchedulingActivity : AppCompatActivity(), WorkoutScheduleListener {
                     } else { // also need to initialize the schedule list
                         events[selectedDay] = mutableListOf(newEvent)
                     }
+
+                    // save new event to DataStore
+                    setDataStoreAtListPosition(DataStoreKey.WORKOUT_EVENT, -1,
+                        newEvent, getDataStoreHelper(this))
 
                     // update display list
                     displayWorkoutScheduleForDay(selectedDay)
